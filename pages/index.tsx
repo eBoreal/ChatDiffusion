@@ -28,7 +28,7 @@ export default function Home() {
           </button>
         </div>
 
-        <h1 className="mt-80 mb-40 font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
+        <h1 className="mt-40 mb-40 font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
             Start from existing images, create entirely new ones, edit them, iterate, share them... 
         </h1>
 
