@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color-scheme: dark;
+  color: white;
+  background: #0d1017;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+html {
+  overflow-y: scroll;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* style the scrollbar */
+::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-chatbox;
+  border-radius: 0.5rem;
+}
+
+
+.dropCard {
+  background-color: #907CFF;
+  background-image: linear-gradient(135deg, #907CFF 0%, #907CFF 100%);
+}
+
+.dropCardButton {
+  background-color: #6955d7;
+}
+
+.dropCardText {
+  background-color: #FF8C82;
+  background-image: linear-gradient(to bottom right);
+}  
+
+.dropCardTextButton {
+  background-color: #c8635a;
+}
+
+.text-gradient {
+  --tw-gradient-from: #FF8C82;
+  --tw-gradient-to: #907CFF;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+/* Account */
+
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.account > * > .avatarField {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.account > * > .avatarField > .avatarContainer {
+  margin-right: 20px;
+}
+
+.link {
+  @apply inline-flex items-center leading-6 font-bold transition ease-in-out duration-75 cursor-pointer text-zinc-200 rounded-xl px-5 py-2 text-lg;
+}
+
+.link:hover {
+  @apply text-zinc-100;
+}
+
+.link:focus {
+  @apply outline-none text-zinc-100 ring-2 ring-pink-500 ring-opacity-50;
+}
