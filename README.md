@@ -11,6 +11,7 @@ Instruct Pix2Pix is a model trained to combine the learnings of GPT-3 & Stable D
 - They then train Pix2Pix to generate image from prompt 2 given instruction and image from prompt 1
 
 More at: https://www.timothybrooks.com/instruct-pix2pix
+Try the app at: https://chat-diffusion-beta.vercel.app/
 
 
 Venus de Milo             |  Turn her into a cyborg
