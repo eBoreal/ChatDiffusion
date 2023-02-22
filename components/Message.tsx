@@ -354,6 +354,8 @@ export namespace Message {
         },
       ];
       MessageList.use.getState().editMessage(uid, newMsg);
+      DecisionBox.use.getState().setHidden(false);
+      ChatBar.use.getState().setHidden(true);
       return;
     }
 
@@ -432,7 +434,6 @@ export namespace Message {
 
     DecisionBox.use.getState().setHidden(false)
     ChatBar.use.getState().setHidden(true)
-
   }
 
   export const askSupabase = async (
