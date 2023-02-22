@@ -1,4 +1,5 @@
 import React from "react";
+import Link from 'next/link';
 
 import { useRouter } from 'next/router';
 
@@ -115,6 +116,23 @@ export default function Home() {
         </button>
 
 
+        <div className={`my-20 sm:flex sm:flex-row  dw-full hover:bg-black/10 group`}>
+          <div
+              className={`bg-chatbox rounded-lg p-8 max-h-72 m-auto w-full relative px-2 lg:px-0 flex flex-col`}
+            >
+            <p className="font-extrabold text-white sm:text-center sm:text-4xl m-auto">
+              Credits and Acknowledgements
+            </p>
+            <ul className="mt-5 p-8 text-zinc-200 sm:text-center sm:text-xl m-auto">
+              <li>- Tim Brooks et al. for the <Link  href="https://www.timothybrooks.com/instruct-pix2pix" className="underline">Instruct Pix2pix model</Link ></li>
+              <li>- Stability.ai for open sourcing the original <Link href="https://arxiv.org/abs/2112.10752" className="underline">Stable Diffusion model </Link ></li>
+              <li>- kajDev for the original <Link  href="https://github.com/KAJdev/diffusion-chat" className="underline">front-end code base</Link ></li>
+              <li>- HuggingFace diffusers for their <Link  href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</Link ></li>
+            </ul>
+          </div>
+        </div>
+
+        
         <div className="m-auto mt-20">
           <BigLogo/>
         </div>  
