@@ -10,7 +10,7 @@ type Profiles = Database['public']['Tables']['profiles']['Row']
 import {Logo} from './Logo';
 import s from '../styles/navbar.module.css';
 import { MessageList } from "./MessageList";
-
+import { getCredits } from "../utils/api-helpers"
 
 export function NavBar() {
   const supabase = useSupabaseClient<Database>()
@@ -27,46 +27,23 @@ export function NavBar() {
 
   const messages = MessageList.use.getState().messages
 
-
   useEffect(() => {
-    getCredits()
-  }, [session])
+    if (!supabase || !user || !user.id) return;
 
+    getCredits({supabase, userId: user.id}).then(setCredits)
+  }, [session])
+  
   useEffect(() => {
     const unsub = MessageList.use.subscribe(()=>{
-      getCredits()
+      if (!supabase || !user || !user.id) return;
+
+      getCredits({supabase, userId: user.id}).then(setCredits)
     })
     
     return () => unsub();
   }, [])
 
-  async function getCredits() {
-    try {
-      setLoading(true)
-      if (!user) return;
-
-      
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select(`available_credits`)
-        .eq('id', user.id)
-        .single()
-
-      if (error && status !== 406) {
-        throw error
-      }
-
-      if (data) {
-        setCredits(data.available_credits ?? 0)
-      }
-    } catch (error) {
-      // alert('Error loading user data!')
-      console.log(error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  
   return (
     <nav className={s.root}>
       <a href="#skip" className="sr-only focus:not-sr-only">
@@ -91,7 +68,7 @@ export function NavBar() {
               </Link>
             ) : (
               <Link href="/account" className="link dropCardText">
-                Credits: {credits}
+                {`Credits: ${credits}`}
               </Link>
             )}
 

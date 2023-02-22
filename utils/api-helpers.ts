@@ -103,6 +103,8 @@ export async function getCredits ({
       if (data && data.available_credits) {
           return data.available_credits
       }
+
+      return 0
   } catch (error) {
       // alert('Error loading user data!')
       console.log(error)
