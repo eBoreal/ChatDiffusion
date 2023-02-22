@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 
 import { Album, Send, Settings2 } from "lucide-react";
 import create from "zustand";
@@ -14,7 +14,6 @@ import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
 import { getCredits } from '../utils/api-helpers'
-// import { Router } from "react-router-dom";
 
 export function ChatBar({
   }) {

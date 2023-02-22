@@ -2,16 +2,12 @@ import React from "react";
 import Link from 'next/link';
 
 import { useRouter } from 'next/router';
-
-
 import { BigLogo } from '../components/Logo'
 
 import Image from 'next/image'
 
 export default function Home() {
   const router = useRouter();
-
-  
 
   return (
     <section>
