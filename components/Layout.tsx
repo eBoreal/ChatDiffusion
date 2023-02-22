@@ -26,7 +26,7 @@ export default function Layout({ children }: Props) {
             <link rel="icon" href="/cd-3-logo.svg" />
         </Head>
         <NavBar/>
-        <main id="skip">{children}</main>
+        <>{children}</>
       </>
     );
   }

@@ -7,7 +7,7 @@ import { MessageList, sessionID, makeId } from "./MessageList";
 import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
-import { DecisionBox } from "./DecisionBox";
+import { DecisionBox } from "./SideBar";
 import { updateNew } from "typescript";
 
 export function Message({ id }: { id: string }) {

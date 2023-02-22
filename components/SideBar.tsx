@@ -9,7 +9,7 @@ import { Settings } from "./Settings";
 import { useDropzone } from "react-dropzone";
 
 
-export function DecisionBox({
+export function SideBar({
   }) {
 
     const [chatBarHidden, setChatBarHidden] = ChatBar.use((state) => [
@@ -42,20 +42,17 @@ export function DecisionBox({
     function TextBox(
     ) {
         return (
-            <div onClick={() => handleChoice(false)} className={'w-9/12 m-5 p-5 text-center mr-auto max-w-[30rem] rounded-3xl dropCardText opacity-90'}>
-                <div className={'rounded-2xl border-dashed border-2 border-slate-300'}>
-                <div className={"dropzone p-2 rounded-l dtext-white"}>
-                    <h1 className={'text-4xl font-bold'}>
-                        Text to Image
+            <div onClick={() => handleChoice(false)} className={'mb-6 p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCardText opacity-90'}>
+                <div className={'dropzone p-1 mt-1 rounded-2xl dtext-white'}>
+                    <h1 className={'text-xl font-bold'}>
+                        Stable Diffusion 1.5
                     </h1>
-                    <p className={'m-2'}>
-                        Choose this to generate a new image from a text prompt
+                    <p className={'m-1'}>
+                        Start from plain english.
                     </p>
-                    <button onClick={() => handleChoice(false)} type="button" className="btn dropCardTextButton h-12 w-48 m-2 rounded-2xl">
+                    <button onClick={() => handleChoice(false)} type="button" className="btn dropCardTextButton h-8 w-48 mt-2 rounded-2xl">
                         Continue to prompt
                     </button>
-    
-                </div>
                 </div>
             </div>
         );
@@ -91,34 +88,32 @@ export function DecisionBox({
             });
         
             return (
-                <div className={'w-9/12 m-5 p-5 text-center ml-auto max-w-[30rem] rounded-3xl dropCard opacity-90'}>
-                    <div className={'rounded-2xl border-dashed border-2 border-slate-300'}>
-                    <div {...getRootProps({ className: "dropzone p-2 rounded-l dtext-white" })}>
+                <div className={'p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCard opacity-90'}>
+                    <div {...getRootProps({ className: "dropzone p-1 mt-1 rounded-2xl dtext-white border-dashed border-2 border-slate-300" })}>
                         <input {...getInputProps()} />
-                        <h1 className={'text-4xl font-bold'}>
-                            Image to Image
+                        <h1 className={'text-xl font-bold'}>
+                            Instruct Pix2Pix
                         </h1>
-                        <p className={'m-2'}>
-                            Drag and drop an image to edit it with prompts
+                        <p className={'m-1'}>
+                            Drag and drop an image to edit it.
                         </p>
-                        <button type="button" className="btn dropCardButton h-12 w-48 m-2 rounded-2xl">
+                        <button type="button" className="btn dropCardButton h-8 w-48 m-1 rounded-2xl">
                             Click to select an image
                         </button>
-            
-                    </div>
                     </div>
                 </div>
             );
 
         }
+    
 
     return (
         <>
             {!hidden ?
-                <>
+                <div className="flex flex-row w-full justify-evenly">
                     <ImageBox></ImageBox>
                     <TextBox></TextBox>
-                </>
+                </div>
             :
                 <></>
             }

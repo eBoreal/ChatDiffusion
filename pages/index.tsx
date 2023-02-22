@@ -116,7 +116,7 @@ export default function Home() {
         </button>
 
 
-        <div className={`my-20 sm:flex sm:flex-row  dw-full hover:bg-black/10 group`}>
+        <div className={`my-20 sm:flex sm:flex-row  w-full hover:bg-black/10 group`}>
           <div
               className={`bg-chatbox rounded-lg p-8 max-h-72 m-auto w-full relative px-2 lg:px-0 flex flex-col`}
             >

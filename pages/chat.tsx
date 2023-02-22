@@ -3,7 +3,7 @@ import React from "react";
 import { ChannelTop } from "../components/ChannelTop";
 import { ChatBar } from "../components/ChatBar";
 import { MessageList } from "../components/MessageList";
-import { DecisionBox } from "../components/DecisionBox"
+import { SideBar } from "../components/SideBar"
 
 import { redirectToLogin } from '../utils/protectRoutes'
 
@@ -48,22 +48,24 @@ export default function Chat() {
 
   return (
     <>
-      <main className="flex flex-col gap-1 w-full" ref={mainConatiner}>
+      <main className="flex flex-col gap-1 w-full pb-[3rem]" ref={mainConatiner}>
           <ChannelTop />
           <MessageList />
       </main>
 
-      <div
-          className="fixed bottom-0 w-screen bg-background"
+
+      <div className="fixed bottom-0 w-full bg-background"
           ref={inputContainer}>
             <ChatBar/>
       </div>
-        
+
       <div className="fixed bottom-0 w-screen flex flex-row"
-          ref={inputContainer}>
-            <DecisionBox/>
+        ref={inputContainer}>
+            <SideBar/>
       </div>
 
+
+      
     </>
   );
 }

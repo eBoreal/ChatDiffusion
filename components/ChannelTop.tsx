@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 export function ChannelTop() {
   return (
     <>
-      <div className="flex flex-col gap-3 pb-6 mx-auto max-w-[60rem] mb-28 p-2 lg:p-0 w-full">
+      <div className="flex flex-col gap-3 pb-6 mx-auto max-w-[60rem] p-2 lg:p-0 w-full">
         <div className="p-3 rounded-full bg-white/10 w-fit">
           <MessageCircle className="text-white/75" size={32} />
         </div>

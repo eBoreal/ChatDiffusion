@@ -56,6 +56,8 @@ export default async function handler(
           
           const modelInputs = makeModelInputObject(body)
           
+          // for debug
+          // return res.status(504).end()
 
           // console.log(modelInputs)
           
