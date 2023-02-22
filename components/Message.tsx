@@ -255,8 +255,6 @@ export namespace Message {
     if (!prompt && !modifiers) return;
     if (!userId) return;
 
-    console.log("sending mesage as: ", userId)
-
     const settings = Settings.use.getState().settings;
     Settings.use.getState().setOpen(false);
 

@@ -38,7 +38,7 @@ export function NavBar() {
   async function getCredits() {
     try {
       setLoading(true)
-      if (!user) throw new Error('No user')
+      if (!user) return;
 
       
       let { data, error, status } = await supabase
