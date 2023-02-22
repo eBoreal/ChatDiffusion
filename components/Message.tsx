@@ -286,16 +286,6 @@ export namespace Message {
       ChatBar.use.getState().setHidden(true)
       return;
     }
-
-    // decrement first -> TODO: should be conditional on op success
-    let supaRes;
-    try {
-      supaRes = await askSupabase(userId);
-      
-    } catch (e) {
-      console.log("Decrementing failed: ", e);
-      return;
-    }
     
     let res;
     let inputMsg;
@@ -344,10 +334,13 @@ export namespace Message {
     if (!res || !res.ok) {
       switch (res?.status) {
         case 400:
-          newMsg.error = "Bad request";
+          newMsg.error = "Something is wrong with your request";
           break;
         case 429:
           newMsg.error = "You're too fast! Slow down!";
+          break;
+        case 504:
+          newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again.";
           break;
         default:
           newMsg.error = "Something went wrong";
@@ -379,6 +372,16 @@ export namespace Message {
       return;
     }
     MessageList.use.getState().editMessage(uid, newMsg);
+    
+    // decrement credits
+    let supaRes;
+    try {
+      supaRes = await askSupabase(userId);
+      
+    } catch (e) {
+      console.log("Decrementing failed: ", e);
+      return;
+    }
 
     // model responded with something
     const res_uid = makeId();
