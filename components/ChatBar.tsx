@@ -8,15 +8,12 @@ import { Settings } from "./Settings";
 
 import React from "react";
 
-import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
-import { Database } from '../types/supabase'
-type Profiles = Database['public']['Tables']['profiles']['Row']
+import { useUser } from '@supabase/auth-helpers-react'
 
 
 export function ChatBar({
   }) {
 
-    const supabase = useSupabaseClient<Database>()
     const user = useUser()
 
     const [prompt, setPrompt] = ChatBar.use((state) => [

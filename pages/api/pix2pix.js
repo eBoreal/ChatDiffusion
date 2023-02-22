@@ -55,6 +55,7 @@ export default async function handler(
           }
           
           const modelInputs = makeModelInputObject(body)
+          
 
           // console.log(modelInputs)
           

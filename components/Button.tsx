@@ -1,6 +1,9 @@
 import { Message } from "./Message";
 import { PromptBook } from "./PromptBook";
 
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { Database } from '../types/supabase';
+
 function saveImage(image: string, name: string) {
   // download image from external URL
   fetch(image)
@@ -27,13 +30,15 @@ export function Button({
   selectedImage: number;
 }) {
   const addPrompt = PromptBook.use((state) => state.addPrompt);
+  const user = useUser()
 
   return (
     <button
       className="border-white/10 border rounded px-3 py-1 text-white/75 font-semibold hover:bg-backgroundSecondary hover:text-white/100 duration-200"
       onClick={() => {
         if (btn.id == "regenerate") {
-          Message.sendMessage(message.prompt, message.modifiers);
+          console.log("regenerate")
+          Message.sendMessage(message.prompt, user?.id, message.modifiers);
         } else if (btn.id == "save") {
           if (selectedImage === -1) {
             message.images.forEach((image, i) =>
