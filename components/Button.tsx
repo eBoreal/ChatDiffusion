@@ -1,8 +1,11 @@
 import { Message } from "./Message";
 import { PromptBook } from "./PromptBook";
 
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Database } from '../types/supabase';
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Database } from '../types/supabase'
+type Profiles = Database['public']['Tables']['profiles']['Row']
+
+import { getCredits } from '../utils/api-helpers'
 
 function saveImage(image: string, name: string) {
   // download image from external URL
@@ -30,7 +33,22 @@ export function Button({
   selectedImage: number;
 }) {
   const addPrompt = PromptBook.use((state) => state.addPrompt);
+  const supabase = useSupabaseClient<Database>()
   const user = useUser()
+  
+  function handleSendMessage(prompt: string, modifiers: string | undefined) {
+    if (!(user && user.id)) return console.log("Need to be logged in to send message")
+    
+    getCredits({supabase, userId: user.id}
+      ).then((credits) => {
+        // if (!credits) {
+        //   console.log("Not enough credits to send message")
+        //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
+        //   return
+        // } 
+        
+        Message.sendMessage(prompt, user.id, credits, modifiers)})
+  }
 
   return (
     <button
@@ -38,7 +56,7 @@ export function Button({
       onClick={() => {
         if (btn.id == "regenerate") {
           console.log("regenerate")
-          Message.sendMessage(message.prompt, user?.id, message.modifiers);
+          handleSendMessage(message.prompt, message.modifiers);
         } else if (btn.id == "save") {
           if (selectedImage === -1) {
             message.images.forEach((image, i) =>
@@ -54,7 +72,7 @@ export function Button({
             );
           }
         } else if (btn.id == "remix") {
-          Message.sendMessage(message.prompt, undefined);
+          handleSendMessage(message.prompt, message.modifiers)
         } else if (btn.id == "save_prompt" && message.prompt) {
           addPrompt(message.prompt);
         }

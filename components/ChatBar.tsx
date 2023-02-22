@@ -14,13 +14,13 @@ import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
 import { getCredits } from '../utils/api-helpers'
-import { Router } from "react-router-dom";
+// import { Router } from "react-router-dom";
 
 export function ChatBar({
   }) {
     const supabase = useSupabaseClient<Database>()
     const user = useUser()
-    const router = useRouter()
+    // const router = useRouter()
 
 
     const [prompt, setPrompt] = ChatBar.use((state) => [
