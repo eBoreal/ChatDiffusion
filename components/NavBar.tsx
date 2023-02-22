@@ -73,7 +73,7 @@ export function NavBar() {
             <Link href="/" className='flex flex-row' aria-label="Logo">
                 <Logo />
                 <p className="font-extrabold text-white ml-2 text-xl">
-                  ChatDiffusion
+                  ChatDiffusion [beta]
                 </p>
             </Link>
           </div>

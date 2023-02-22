@@ -18,7 +18,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto my-10 py-8 sm:flex sm:flex-col sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            ChatDiffusion [beta]
+            ChatDiffusion
           </h1>
           <p className="mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl max-w-2xl m-auto">
             Edit images from text.
