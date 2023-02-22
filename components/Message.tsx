@@ -7,8 +7,8 @@ import { MessageList, sessionID, makeId } from "./MessageList";
 import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
-import { DecisionBox } from "./SideBar";
-import { updateNew } from "typescript";
+import { FootBar } from "./FootBar";
+
 
 export function Message({ id }: { id: string }) {
   const [message, editMessage] = MessageList.useMessage(id);
@@ -249,6 +249,7 @@ export namespace Message {
   export const sendMessage = async (
     prompt: string,
     userId: string | undefined,
+    credits: string,
     modifiers?: string
   ) => {
 
@@ -257,9 +258,7 @@ export namespace Message {
 
     const settings = Settings.use.getState().settings;
     Settings.use.getState().setOpen(false);
-
     ChatBar.use.getState().setPrompt("");
-
 
     const uid = makeId();
     const newMsg: Message = {
@@ -278,11 +277,20 @@ export namespace Message {
     const model = settings.model
     MessageList.use.getState().addMessage(newMsg);
 
+    if (!credits) {
+      newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
+      newMsg.loading = false;
+      MessageList.use.getState().editMessage(uid, newMsg);
+      FootBar.use.getState().setHidden(false);
+      ChatBar.use.getState().setHidden(true);
+      return;
+    }
+
     if (model !== "instruct-pix2pix" && model !== "stable-diffusion-v1-5") {
       newMsg.loading = false;
       newMsg.error = `Support for ${settings.model} is not implemented yet`;
       MessageList.use.getState().editMessage(uid, newMsg);
-      DecisionBox.use.getState().setHidden(false)
+      FootBar.use.getState().setHidden(false)
       ChatBar.use.getState().setHidden(true)
       return;
     }
@@ -303,7 +311,7 @@ export namespace Message {
         newMsg.error = "Pix2pix needs an image to edit, add one by draging it over to the Image to Image box";
         newMsg.loading = false;
         MessageList.use.getState().editMessage(uid, newMsg);
-        DecisionBox.use.getState().setHidden(false)
+        FootBar.use.getState().setHidden(false)
         ChatBar.use.getState().setHidden(true)
         return;
       }
@@ -354,7 +362,7 @@ export namespace Message {
         },
       ];
       MessageList.use.getState().editMessage(uid, newMsg);
-      DecisionBox.use.getState().setHidden(false);
+      FootBar.use.getState().setHidden(false);
       ChatBar.use.getState().setHidden(true);
       return;
     }
@@ -432,7 +440,7 @@ export namespace Message {
 
     MessageList.use.getState().addMessage(resMsg);
 
-    DecisionBox.use.getState().setHidden(false)
+    FootBar.use.getState().setHidden(false)
     ChatBar.use.getState().setHidden(true)
   }
 

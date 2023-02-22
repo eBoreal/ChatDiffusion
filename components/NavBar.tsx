@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
+import create from "zustand";
 
 import { useUser, useSupabaseClient, Session, useSession} from '@supabase/auth-helpers-react'
 import { Database } from '../types/supabase'
@@ -18,7 +19,11 @@ export function NavBar() {
   const router = useRouter()
 
   const [loading, setLoading] = useState(true)
-  const [credits, setCredits] = useState<Profiles['available_credits']>(0)
+
+  const [credits, setCredits] = NavBar.use((state) => [
+    state.credits,
+    state.setCredits,
+  ])
 
   const messages = MessageList.use.getState().messages
 
@@ -52,7 +57,7 @@ export function NavBar() {
       }
 
       if (data) {
-        setCredits(data.available_credits)
+        setCredits(data.available_credits ?? 0)
       }
     } catch (error) {
       // alert('Error loading user data!')
@@ -106,3 +111,15 @@ export function NavBar() {
   );
 };
 
+
+export type NavBar = {
+  credits: number;
+  setCredits: (credits: number) => void; 
+};
+
+export namespace NavBar {
+  export const use = create<NavBar>()((set) => ({
+    credits: 0,
+    setCredits: (credits: number) => set((state: NavBar)=> ({ credits }))
+  }));
+}

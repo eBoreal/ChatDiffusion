@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
-import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
+import { Session } from '@supabase/auth-helpers-react'
 import { Database } from '../types/supabase'
 type Profiles = Database['public']['Tables']['profiles']['Row']
 
-import Stripe from 'stripe'
-import { loadStripe } from '@stripe/stripe-js';
+export default function Account( {
+  supabase,
+  user,
+  session 
+}: { 
+  supabase: any,
+  user: any
+  session: Session | null,
+}) {
 
-import { fetchPostJSON } from '../utils/api-helpers'
-
-
-
-export default function Account({ session }: { session: Session | null }) {
-  const supabase = useSupabaseClient<Database>()
-  const user = useUser()
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState<Profiles['username']>(null)
   const [credits, setCredits] = useState<Profiles['available_credits']>(null)
@@ -51,47 +51,6 @@ export default function Account({ session }: { session: Session | null }) {
     }
   }
 
-  async function addCredits({
-    credits_increment
-  }: {
-    credits_increment: number
-  }) {
-    try {
-      setLoading(true)
-      if (!user || !user.id ) throw new Error('No user')
-
-      const checkoutSession: Stripe.Checkout.Session = await fetchPostJSON(
-          "api/create-stripe-checkout", 
-          { 
-            amount: credits_increment,
-            userId: user.id 
-          }
-      );
-
-      if ((checkoutSession as any).statusCode === 500) {
-        console.error((checkoutSession as any).message);
-        return;
-      }
-
-        // Redirect to Checkout.
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-      const { error } = await stripe!.redirectToCheckout({
-        // Make the id field from the Checkout Session creation API response
-        // available to this file, so you can provide it as parameter here
-        // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-        sessionId: checkoutSession.id,
-      });
-      // If `redirectToCheckout` fails due to a browser or network
-      // error, display the localized error message to your customer
-      // using `error.message`.
-      console.warn(error.message);
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   async function updateProfile({
     username,
     avatar_url,
@@ -124,43 +83,6 @@ export default function Account({ session }: { session: Session | null }) {
 
   return (
     <div className="relative w-full mx-auto max-w-[60.75rem] sm:flex sm:flex-col sm:align-centersm:align-center">
-      <div className='bg-popupBar rounded-lg w-full sm:flex sm:flex-col sm:align-centersm:align-center mt-8 p-4'>
-          <p className="text-2xl font-extrabold text-zinc-200">
-              Available credits: {credits}
-          </p>
-          <p className="text-2xl font-extrabold text-zinc-200 mt-10">
-              Add credits:
-          </p>
-          <div className='flex'>
-            <button 
-            className="btn dropCard font-bold text-xl h-12 w-48 mt-8 rounded-2xl mx-auto"
-            type="button"
-            onClick={() => addCredits({credits_increment: 10})}
-            >
-                10 credits
-            </button>
-            <button 
-            className="btn dropCardText font-bold text-xl h-12 w-48 mt-8 rounded-2xl mx-2"
-            type="button"
-            onClick={() => addCredits({credits_increment: 20})}
-            >
-                20 credits
-            </button>
-            <button 
-            className="btn bg-indigo-900 font-bold text-xl h-12 w-48 mt-8 rounded-2xl mx-auto"
-            type="button"
-            onClick={() => addCredits({credits_increment: 100})}
-            >
-                100 credits
-            </button>
-          </div>
-          <p className="font-extrabold text-zinc-200 mt-10">
-              * 1 credit = 9 cents
-          </p>
-
-
-      </div>
-
       <div className='bg-popupBar rounded-lg w-full sm:flex sm:flex-col sm:align-centersm:align-center mt-8 p-2'>
           <p className="text-2xl font-extrabold text-zinc-200 mb-2">
               Update your profile info here

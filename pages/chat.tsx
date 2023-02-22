@@ -3,7 +3,7 @@ import React from "react";
 import { ChannelTop } from "../components/ChannelTop";
 import { ChatBar } from "../components/ChatBar";
 import { MessageList } from "../components/MessageList";
-import { SideBar } from "../components/SideBar"
+import { FootBar } from "../components/FootBar"
 
 import { redirectToLogin } from '../utils/protectRoutes'
 
@@ -15,19 +15,16 @@ export default function Chat() {
   const inputContainer = React.useRef<HTMLDivElement>(null);
   const mainConatiner = React.useRef<HTMLDivElement>(null);
 
-
   React.useEffect(() => {
     if (mainConatiner.current && inputContainer.current) {
-      mainConatiner.current.style.marginTop = `calc(100vh - ${
-        inputContainer.current.offsetHeight + 24
-      }px - ${mainConatiner.current.offsetHeight + 24}px)`;
+      mainConatiner.current.style.marginTop = `calc(100vh - ${425}px)`;
     }
 
     const ubnsub = MessageList.use.subscribe(() => {
       setTimeout(() => {
         if (mainConatiner.current && inputContainer.current) {
           mainConatiner.current.style.marginBottom = `${
-            inputContainer.current.offsetHeight + 100
+            inputContainer.current.offsetHeight + 10
           }px`;
         }
 
@@ -48,24 +45,18 @@ export default function Chat() {
 
   return (
     <>
-      <main className="flex flex-col gap-1 w-full pb-[3rem]" ref={mainConatiner}>
+      <main className="flex flex-col gap-1 w-full items-start" ref={mainConatiner}>
           <ChannelTop />
           <MessageList />
       </main>
 
+      <div className="fixed bottom-0 w-screen"
+           ref={inputContainer}>
 
-      <div className="fixed bottom-0 w-full bg-background"
-          ref={inputContainer}>
-            <ChatBar/>
+        {/* 1 showing at the time depending on state */}
+        <ChatBar/>
+        <FootBar/>
       </div>
-
-      <div className="fixed bottom-0 w-screen flex flex-row"
-        ref={inputContainer}>
-            <SideBar/>
-      </div>
-
-
-      
     </>
   );
 }

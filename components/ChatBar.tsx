@@ -1,20 +1,27 @@
+import React from "react";
+import { useRouter } from 'next/router';
+
 import { Album, Send, Settings2 } from "lucide-react";
 import create from "zustand";
+
+import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Database } from '../types/supabase'
+type Profiles = Database['public']['Tables']['profiles']['Row']
+
 import { Message } from "./Message";
 import { MessageList } from "./MessageList";
 import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
-
-import React from "react";
-
-import { useUser } from '@supabase/auth-helpers-react'
-
+import { getCredits } from '../utils/api-helpers'
+import { Router } from "react-router-dom";
 
 export function ChatBar({
   }) {
-
+    const supabase = useSupabaseClient<Database>()
     const user = useUser()
+    const router = useRouter()
+
 
     const [prompt, setPrompt] = ChatBar.use((state) => [
     state.prompt,
@@ -38,8 +45,22 @@ export function ChatBar({
 
   const history = MessageList.use((state) => state.messages);
 
+  function handleSendMessage(prompt: string) {
+    if (!(user && user.id)) return console.log("Need to be logged in to send message")
+    
+    getCredits({supabase, userId: user.id}
+      ).then((credits) => {
+        // if (!credits) {
+        //   console.log("Not enough credits to send message")
+        //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
+        //   return
+        // } 
+        
+        Message.sendMessage(prompt, user.id, credits)})
+  }
+
   return (
-    <>
+    <div className="bg-background">
       {!hidden ?
         <>
           <div
@@ -83,7 +104,7 @@ export function ChatBar({
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    Message.sendMessage(prompt, user?.id);
+                    handleSendMessage(prompt);
                     e.preventDefault();
                     // check if on mobile
                     if (window.innerWidth < 768) {
@@ -146,7 +167,7 @@ export function ChatBar({
                 <div className="h-[1.5rem] w-[1px] bg-white/10 rounded" />
                 <button
                   className={`${prompt ? "cursor-pointer" : "cursor-default"}`}
-                  onClick={() => Message.sendMessage(prompt, user?.id)}
+                  onClick={() => handleSendMessage(prompt)}
                 >
                   <Send
                     className={`text-accent rotate-45 ${
@@ -163,7 +184,7 @@ export function ChatBar({
       :
         <></>              
       }
-    </>
+    </div>
 
 
   );

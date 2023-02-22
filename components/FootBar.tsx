@@ -9,7 +9,7 @@ import { Settings } from "./Settings";
 import { useDropzone } from "react-dropzone";
 
 
-export function SideBar({
+export function FootBar({
   }) {
 
     const [chatBarHidden, setChatBarHidden] = ChatBar.use((state) => [
@@ -17,7 +17,7 @@ export function SideBar({
       state.setHidden,
     ]);
 
-    const [hidden, setHidden] = DecisionBox.use((state) => [
+    const [hidden, setHidden] = FootBar.use((state) => [
       state.hidden,
       state.setHidden,
     ]);
@@ -42,7 +42,7 @@ export function SideBar({
     function TextBox(
     ) {
         return (
-            <div onClick={() => handleChoice(false)} className={'mb-6 p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCardText opacity-90'}>
+            <div onClick={() => handleChoice(false)} className={'p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCardText opacity-90'}>
                 <div className={'dropzone p-1 mt-1 rounded-2xl dtext-white'}>
                     <h1 className={'text-xl font-bold'}>
                         Stable Diffusion 1.5
@@ -110,7 +110,7 @@ export function SideBar({
     return (
         <>
             {!hidden ?
-                <div className="flex flex-row w-full justify-evenly">
+                <div className="flex flex-row w-full justify-evenly mb-5">
                     <ImageBox></ImageBox>
                     <TextBox></TextBox>
                 </div>
@@ -123,14 +123,14 @@ export function SideBar({
 
 }
 
-export type DecisionBox = {
+export type FootBar = {
   hidden: boolean;
   setHidden: (hidden: boolean) => void;
 };
 
-export namespace DecisionBox {
-  export const use = create<DecisionBox>()((set) => ({
+export namespace FootBar {
+  export const use = create<FootBar>()((set) => ({
     hidden: false,
-    setHidden: (hidden: boolean) => set((state: DecisionBox)=> ({ hidden }))
+    setHidden: (hidden: boolean) => set((state: FootBar)=> ({ hidden }))
   }));
 }
