@@ -17,6 +17,7 @@ export default function Login() {
       <div className="bg-background">
         <div className="w-1/3 mx-auto">
           <Auth 
+            redirectTo={`${process.env.NEXT_PUBLIC_BASE_URL}/chat`}
             providers={['google']}
             supabaseClient={supabase} 
             appearance={{ theme: ThemeSupa }} 
