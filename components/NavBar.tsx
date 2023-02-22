@@ -1,11 +1,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import create from "zustand";
 
-import { useUser, useSupabaseClient, Session, useSession} from '@supabase/auth-helpers-react'
+import { useUser, useSupabaseClient, useSession} from '@supabase/auth-helpers-react'
 import { Database } from '../types/supabase'
-type Profiles = Database['public']['Tables']['profiles']['Row']
 
 import {Logo} from './Logo';
 import s from '../styles/navbar.module.css';
@@ -18,21 +17,17 @@ export function NavBar() {
   const session = useSession()
   const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
-
   const [credits, setCredits] = NavBar.use((state) => [
     state.credits,
     state.setCredits,
   ])
-
-  const messages = MessageList.use.getState().messages
 
   useEffect(() => {
     if (!supabase || !user || !user.id) return;
 
     getCredits({supabase, userId: user.id}).then(setCredits)
   }, [session])
-  
+
   useEffect(() => {
     const unsub = MessageList.use.subscribe(()=>{
       if (!supabase || !user || !user.id) return;

@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from 'react'
 import create from "zustand";
 
-import { FootBar } from "./FootBar";
 import { getCredits, addCredits } from '../utils/api-helpers'
 
 
@@ -13,18 +12,6 @@ export function Credits( {
   supabase: any,
   user: any
 }) {
-    const [loading, setLoading] = useState(true)
-
-    const [FootBarHidden, setFootBarHidden] = FootBar.use((state) => [
-      state.hidden,
-      state.setHidden,
-    ]);
-
-    const [hidden, setHidden] = Credits.use((state) => [
-      state.hidden,
-      state.setHidden,
-    ]);
-
     const [credits, setCredits] = Credits.use((state) => [
         state.credits,
         state.setCredits,

@@ -12,8 +12,7 @@ import { useDropzone } from "react-dropzone";
 export function FootBar({
   }) {
 
-    const [chatBarHidden, setChatBarHidden] = ChatBar.use((state) => [
-      state.hidden,
+    const [setChatBarHidden] = ChatBar.use((state) => [
       state.setHidden,
     ]);
 
