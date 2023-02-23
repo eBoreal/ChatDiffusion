@@ -83,7 +83,7 @@ export function Credits( {
               {`You currently have ${credits ?? 0} credits. Add some to keep chatting`}
           </p>
           <div className="flex flex-row ">
-              {Object.values(creditsPlans).map((plan, i) => (
+              {Object.values(creditsPlans)Credits((plan, i) => (
                   <CreditsButton key={i} amount={plan.amount} price={plan.price}/>
               ))}
               <button 
