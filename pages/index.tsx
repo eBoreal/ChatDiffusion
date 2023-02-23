@@ -61,7 +61,6 @@ export default function Home() {
       if (file_paths.length > 0) filename = file_paths.at(-1)
       else filename = file_paths[0]
       name = `"${filename?.split(".")[0].replace(/[\W-0-9]+/g, '').replace(/_/g, " ")}"`
-      console.log(name)
     } else {
       name = "Base Image"
     }
@@ -202,10 +201,10 @@ export default function Home() {
               Credits and Acknowledgements
             </p>
             <ul className="mt-5 p-8 text-zinc-200 sm:text-center sm:text-xl m-auto">
-              <li>- Tim Brooks et al. for the <Link  href="https://www.timothybrooks.com/instruct-pix2pix" className="underline">Instruct Pix2pix model</Link ></li>
-              <li>- Stability.ai for open sourcing the original <Link href="https://arxiv.org/abs/2112.10752" className="underline">Stable Diffusion model </Link ></li>
-              <li>- kajDev for the original <Link  href="https://github.com/KAJdev/diffusion-chat" className="underline">front-end code base</Link ></li>
-              <li>- HuggingFace diffusers for their <Link  href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</Link ></li>
+              <li>- Tim Brooks et al. for the <a  target="_blank" href="https://www.timothybrooks.com/instruct-pix2pix" className="underline">Instruct Pix2pix model</a ></li>
+              <li>- Stability.ai for open sourcing the original <a  target="_blank"  href="https://arxiv.org/abs/2112.10752" className="underline">Stable Diffusion model </a ></li>
+              <li>- kajDev for the original <a  target="_blank"   href="https://github.com/KAJdev/diffusion-chat" className="underline">front-end code base</a ></li>
+              <li>- HuggingFace diffusers for their <a  target="_blank"   href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</a ></li>
             </ul>
           </div>
         </div>
