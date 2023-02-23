@@ -47,7 +47,7 @@ export function Button({
         //   return
         // } 
         
-        Message.sendMessage(prompt, user.id, credits, modifiers)})
+        Message.handleUserMessage(prompt, user.id, credits, modifiers)})
   }
 
   return (

@@ -55,7 +55,7 @@ export function ChatBar({
         //   return
         // } 
         
-        Message.sendMessage(prompt, user.id, credits)})
+        Message.handleUserMessage(prompt, user.id, credits)})
   }
 
   return (

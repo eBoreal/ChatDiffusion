@@ -212,70 +212,15 @@ export namespace Message {
     }
   };
 
-  export const addImageMessage = async (
-    imageUrl: string
-  ) => {
-    const uid = makeId();
-    
-    const settings = Settings.use.getState().settings;
-    const newMsg: Message = {
-      type: MessageType.YOU,
-      id: uid,
-      prompt: '',
-      timestamp: Date.now(),
-      loading: false,
-      buttons: [],
-      error: null,
-      images: [{
-        image: imageUrl,
-        seed: 42,
-        id: "some-string"
-      }],
-      modifiers: undefined,
-      settings: settings,
-      rating: 3,
-    };
-
-    newMsg.buttons = [
-      {
-        text: "Download",
-        id: "save",
-      },
-    ];
-
-    MessageList.use.getState().addMessage(newMsg);  
-  }
 
   export const sendMessage = async (
-    prompt: string,
-    userId: string | undefined,
-    credits: string,
-    modifiers?: string
-  ) => {
-
-    if (!prompt && !modifiers) return;
-    if (!userId) return;
-
-    const settings = Settings.use.getState().settings;
-    Settings.use.getState().setOpen(false);
-    ChatBar.use.getState().setPrompt("");
-
-    const uid = makeId();
-    const newMsg: Message = {
-      type: MessageType.YOU,
-      id: uid,
-      prompt: prompt,
-      modifiers: modifiers || undefined,
-      timestamp: Date.now(),
-      loading: true,
-      buttons: [],
-      error: null,
-      images: [],
-      settings: settings,
-      rating: 3,
-    };
-    const model = settings.model
-    MessageList.use.getState().addMessage(newMsg);
+    userId: string,
+    uid: string,
+    model: string,
+    newMsg: Message,
+    credits: number,
+    count: number = 1
+  ) : Promise<any> => {
 
     if (!credits) {
       newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
@@ -288,7 +233,7 @@ export namespace Message {
 
     if (model !== "instruct-pix2pix" && model !== "stable-diffusion-v1-5") {
       newMsg.loading = false;
-      newMsg.error = `Support for ${settings.model} is not implemented yet`;
+      newMsg.error = `Support for ${model} is not implemented yet`;
       MessageList.use.getState().editMessage(uid, newMsg);
       FootBar.use.getState().setHidden(false)
       ChatBar.use.getState().setHidden(true)
@@ -296,7 +241,6 @@ export namespace Message {
     }
     
     let res;
-    let inputMsg;
     if (model == "instruct-pix2pix" && newMsg.prompt) {
       // recover last message with image
       let lastImages = null;
@@ -325,16 +269,6 @@ export namespace Message {
 
     // -- implement support for SD here -- //
     if (model == "stable-diffusion-v1-5") {
-      if (prompt.length < 150 && !modifiers) {
-        modifiers = PromptEngine.getModifers();
-      }
-  
-      if (settings.modify && modifiers) {
-        prompt = prompt + ", " + modifiers;
-      }
-
-      newMsg.prompt = prompt
-
       res = await askSD15(newMsg)
     }
 
@@ -342,14 +276,21 @@ export namespace Message {
     if (!res || !res.ok) {
       switch (res?.status) {
         case 400:
-          newMsg.error = "Something is wrong with your request";
+          newMsg.error = "Something is wrong with your request. You haven't been credited ;) ";
           break;
         case 429:
-          newMsg.error = "You're too fast! Slow down!";
+          newMsg.error = "You're too fast! Slow down! You haven't been credited ;)";
           break;
         case 504:
-          newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again.";
-          break;
+          if (count && count >= 5) {
+            newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again. You haven't been credited ;)";
+            break;
+          }
+          else {
+            return setTimeout(sendMessage, 5000, userId, uid, model, newMsg, 
+              credits, count + 1)
+          }
+          
         default:
           newMsg.error = "Something went wrong";
           break;
@@ -403,14 +344,14 @@ export namespace Message {
     const resMsg: Message = {
       type: type,
       id: res_uid,
-      prompt: prompt,
-      modifiers: modifiers || undefined,
+      prompt: newMsg.prompt,
+      modifiers: newMsg.modifiers || undefined,
       timestamp: Date.now(),
       loading: true,
       buttons: [],
       error: null,
       images: data,
-      settings: settings,
+      settings: newMsg.settings,
       rating: 3,
     };
 
@@ -442,6 +383,86 @@ export namespace Message {
 
     FootBar.use.getState().setHidden(false)
     ChatBar.use.getState().setHidden(true)
+  }
+
+  export const addImageMessage = async (
+    imageUrl: string
+  ) => {
+    const uid = makeId();
+    
+    const settings = Settings.use.getState().settings;
+    const newMsg: Message = {
+      type: MessageType.YOU,
+      id: uid,
+      prompt: '',
+      timestamp: Date.now(),
+      loading: false,
+      buttons: [],
+      error: null,
+      images: [{
+        image: imageUrl,
+        seed: 42,
+        id: "some-string"
+      }],
+      modifiers: undefined,
+      settings: settings,
+      rating: 3,
+    };
+
+    newMsg.buttons = [
+      {
+        text: "Download",
+        id: "save",
+      },
+    ];
+
+    MessageList.use.getState().addMessage(newMsg);  
+  }
+
+  export const handleUserMessage = async (
+    prompt: string,
+    userId: string | undefined,
+    credits: number,
+    modifiers?: string,
+    count?: number
+  ) => {
+
+    if (!prompt && !modifiers) return;
+    if (!userId) return;
+
+    const settings = Settings.use.getState().settings;
+    Settings.use.getState().setOpen(false);
+    ChatBar.use.getState().setPrompt("");
+
+    const uid = makeId();
+    const newMsg: Message = {
+      type: MessageType.YOU,
+      id: uid,
+      prompt: prompt,
+      modifiers: modifiers || undefined,
+      timestamp: Date.now(),
+      loading: true,
+      buttons: [],
+      error: null,
+      images: [],
+      settings: settings,
+      rating: 3,
+    };
+    const model = settings.model
+
+    if (model == "stable-diffusion-v1-5") {
+      if (prompt.length < 150 && !modifiers) {
+        modifiers = PromptEngine.getModifers();
+      }
+  
+      if (settings.modify && modifiers) {
+        prompt = prompt + ", " + modifiers;
+      }
+      newMsg.prompt = prompt
+    }
+
+    MessageList.use.getState().addMessage(newMsg);
+    sendMessage(userId, uid, model, newMsg, credits)
   }
 
   export const askSupabase = async (

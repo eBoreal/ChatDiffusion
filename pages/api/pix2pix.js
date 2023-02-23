@@ -55,12 +55,10 @@ export default async function handler(
           }
           
           const modelInputs = makeModelInputObject(body)
-          
+                    
           // for debug
           // return res.status(504).end()
 
-          // console.log(modelInputs)
-          
           results = await banana.run(apiKey, modelKey, modelInputs)
 
           let images;
@@ -84,6 +82,11 @@ export default async function handler(
 
 export const config = {
   runtime: 'nodejs',
+  api: {
+    bodyParser: {
+        sizeLimit: '4mb' // Set desired value here
+    }
+}
 }
 
 
