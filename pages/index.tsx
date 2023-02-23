@@ -171,7 +171,7 @@ export default function Home() {
 
         {/* galery of examples */}
         <div className={`dw-full bg-chatbox rounded-lg p-8`}>
-          <h2 className="font-extrabold text-white text-2xl mb-2">Elon's example</h2>
+          <h2 className="font-extrabold text-white text-2xl mb-2">{"Elon's example"}</h2>
           <div className={'sm:flex sm:flex-row space-x-4 '}>
             {examples.map((path: string, i) => <GalleryImage key={i} path={path}/>)}
           </div>
@@ -201,10 +201,10 @@ export default function Home() {
               Credits and Acknowledgements
             </p>
             <ul className="mt-5 p-8 text-zinc-200 sm:text-center sm:text-xl m-auto">
-              <li>- Tim Brooks et al. for the <a  target="_blank" href="https://www.timothybrooks.com/instruct-pix2pix" className="underline">Instruct Pix2pix model</a ></li>
-              <li>- Stability.ai for open sourcing the original <a  target="_blank"  href="https://arxiv.org/abs/2112.10752" className="underline">Stable Diffusion model </a ></li>
-              <li>- kajDev for the original <a  target="_blank"   href="https://github.com/KAJdev/diffusion-chat" className="underline">front-end code base</a ></li>
-              <li>- HuggingFace diffusers for their <a  target="_blank"   href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</a ></li>
+              <li>- Tim Brooks et al. for the <a  href="https://www.timothybrooks.com/instruct-pix2pix" className="underline">Instruct Pix2pix model</a ></li>
+              <li>- Stability.ai for open sourcing the original <a href="https://arxiv.org/abs/2112.10752" className="underline">Stable Diffusion model </a ></li>
+              <li>- kajDev for the original <a   href="https://github.com/KAJdev/diffusion-chat" className="underline">front-end code base</a ></li>
+              <li>- HuggingFace diffusers for their <a  href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</a ></li>
             </ul>
           </div>
         </div>
