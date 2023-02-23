@@ -222,6 +222,8 @@ export namespace Message {
     count: number = 1
   ) : Promise<any> => {
 
+    console.log(`Api not up, sending message for the ${count}th time`)
+
     if (!credits) {
       newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
       newMsg.loading = false;
