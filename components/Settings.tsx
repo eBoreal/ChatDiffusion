@@ -162,13 +162,13 @@ export function Settings() {
           type="range"
           className="w-full h-2 bg-white/10 rounded-full appearance-none"
           min={0}
-          max={35}
+          max={15}
           step={0.1}
           value={settings.scale}
           onChange={(e) => {
             setSettings({
               ...settings,
-              scale: parseInt(e.target.value),
+              scale: parseFloat(e.target.value),
             });
           }}
         />
@@ -182,20 +182,22 @@ export function Settings() {
           <div className="flex flex-col gap-1">
             <div className="flex flex-row justify-between">
               <h1 className="text-white text-sm font-semibold">Image CFG Scale</h1>
-              <p className="text-white/50 text-sm">{settings.img_scale/10}</p>
+              <p className="text-white/50 text-sm">{(settings.img_scale/10).toFixed(2)}</p>
             </div>
             <input
               type="range"
               className="w-full h-2 bg-white/10 rounded-full appearance-none"
               min={0}
-              max={30}
-              step={0.1}
+              max={20}
+              step={0.01}
               value={settings.img_scale}
               onChange={(e) => {
                 setSettings({
                   ...settings,
-                  img_scale: parseInt(e.target.value),
-                });
+                  img_scale: Math.round(parseFloat(e.target.value) * 10) /10,
+                })
+                console.log(settings.img_scale)
+                ;
               }}
             />
           </div>
@@ -318,9 +320,9 @@ export namespace Settings {
       count: 1,
       steps: 30,
       scale: 7,
-      img_scale: 15, // divided by 10 on display and at inference time 
+      img_scale: 13, // divided by 10 on display and at inference time 
       randomize_cfg: false,
-      modify: true,
+      modify: false,
     } as Settings,
     setSettings: (settings: Settings) =>
       set((state: SettingsState) => ({
