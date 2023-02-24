@@ -1,4 +1,16 @@
 export namespace PromptEngine {
+
+  export const makeEditPrompt = () => {
+    const template = editTemplates[Math.floor(Math.random() * editTemplates.length)]
+    let s = template
+      .replace(/{noun}/g, editNouns[Math.floor(Math.random() * editNouns.length)])
+      .replace(/{adverb}/g, editAdverbs[Math.floor(Math.random() * editAdverbs.length)])
+      .replace(/{art}/g, editArts[Math.floor(Math.random() * editArts.length)])
+      .replace(/{style}/g, editStyles[Math.floor(Math.random() * editStyles.length)])
+
+      return s;
+    }
+
   export const makePrompt = () => {
     const template = templates[Math.floor(Math.random() * templates.length)];
     let s = template
@@ -37,6 +49,38 @@ export namespace PromptEngine {
     "{adjective} {noun} {gerund} {adverb} by {artist}",
     "a {adjective} {noun} {gerund} {adverb} by {artist}",
   ];
+
+  const editTemplates = [
+    "make it {adverb}",
+    "make it a {style} {art}",
+    "turn it into a {noun}",
+  ]
+
+  const editAdverbs = [
+    "rain",
+    "snow", 
+  ]
+
+  const editStyles = [
+    "picasso",
+    "modigliani", 
+    "van gogh",
+    "anime",
+    "claymation"
+  ]
+
+  const editArts = [
+    "painting",
+    "sculpture",
+    "photograph"
+  ]
+
+  const editNouns = [
+    "cyborg",
+    "robot", 
+    "lizard"
+  ]
+
 
   const nouns = [
     "dog",

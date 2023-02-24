@@ -74,13 +74,18 @@ export function ChatBar({
                   : "-bottom-[3.75rem]"
               } pr-[0.5rem] w-full lg:pl-0 pl-[0.5rem]`}
             >
-              <div className="bg-popupBar rounded-lg w-full pb-5 px-4 pt-1.5 text-white/75 text-sm">
+              <div className="bg-popupBar rounded-lg w-full mb-2  pb-5 px-4 pt-1.5 text-white/75 text-sm">
                 {"Don't know what to say? "}{" "}
                 <span
                   className="text-blue-400 hover:underline cursor-pointer"
-                  onClick={() => setPrompt(PromptEngine.makePrompt())}
-                >
-                  Surprise Me!
+                  onClick={() => {
+                    (Settings.use.getState().settings.model == "instruct-pix2pix") ?
+                      setPrompt(PromptEngine.makeEditPrompt())
+                    : 
+                      setPrompt(PromptEngine.makePrompt())
+                    }}
+                  >
+                  Suggest me something !
                 </span>
               </div>
             </div>
@@ -98,7 +103,7 @@ export function ChatBar({
               <input
                 type="text"
                 className="w-full text-lg text-white/75 placeholder:text-white/30 outline-none focus:border-none bg-transparent"
-                placeholder="Type what you want to see..."
+                placeholder={(Settings.use.getState().settings.model == "instruct-pix2pix") ? "Tell us how to edit the image..." : "Type what you want to see..."}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
