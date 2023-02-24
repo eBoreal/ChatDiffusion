@@ -215,12 +215,13 @@ export namespace Message {
 
   export const sendMessage = async (
     userId: string,
-    uid: string,
-    model: string,
     newMsg: Message,
     credits: number,
     count: number = 1
   ) : Promise<any> => {
+
+    const model = newMsg?.settings?.model ?? "instruct-pix2pix"
+    const uid = newMsg.id
 
     console.log(`Api not up, sending message for the ${count}th time`)
 
@@ -235,7 +236,7 @@ export namespace Message {
 
     if (model !== "instruct-pix2pix" && model !== "stable-diffusion-v1-5") {
       newMsg.loading = false;
-      newMsg.error = `Support for ${model} is not implemented yet`;
+      newMsg.error = `Support for ${model} is not implemented yet. Open settings to choose another model.`;
       MessageList.use.getState().editMessage(uid, newMsg);
       FootBar.use.getState().setHidden(false)
       ChatBar.use.getState().setHidden(true)
@@ -289,7 +290,7 @@ export namespace Message {
             break;
           }
           else {
-            return setTimeout(sendMessage, 5000, userId, uid, model, newMsg, 
+            return setTimeout(sendMessage, 5000, userId, newMsg, 
               credits, count + 1)
           }
           
@@ -336,30 +337,8 @@ export namespace Message {
       return;
     }
 
-    // model responded with something
-    const res_uid = makeId();
-    const type = (
-      model === "instruct-pix2pix" 
-        ? MessageType.PIX2PIX
-        : MessageType.STABLE_DIFFUSION);
-
-    const resMsg: Message = {
-      type: type,
-      id: res_uid,
-      prompt: newMsg.prompt,
-      modifiers: newMsg.modifiers || undefined,
-      timestamp: Date.now(),
-      loading: true,
-      buttons: [],
-      error: null,
-      images: data,
-      settings: newMsg.settings,
-      rating: 3,
-    };
-
-
-    resMsg.loading = false;
-    resMsg.buttons = [
+    newMsg.loading = false;
+    newMsg.buttons = [
       {
         text: "Regenerate",
         id: "regenerate",
@@ -375,13 +354,13 @@ export namespace Message {
     ];
 
     if (newMsg.modifiers) {
-      resMsg.buttons.push({
+      newMsg.buttons.push({
         text: "Remix",
         id: "remix",
       });
     }
 
-    MessageList.use.getState().addMessage(resMsg);
+    MessageList.use.getState().editMessage(uid, newMsg);
 
     FootBar.use.getState().setHidden(false)
     ChatBar.use.getState().setHidden(true)
@@ -421,6 +400,41 @@ export namespace Message {
     MessageList.use.getState().addMessage(newMsg);  
   }
 
+  export const makeMessage = (
+    prompt: string,
+    settings: any,
+    loading: boolean,
+    type: MessageType,
+    modifiers?: string
+  ) => {
+
+    const uid = makeId();
+    const newMsg: Message = {
+      type: type,
+      id: uid,
+      prompt: prompt,
+      modifiers: modifiers || undefined,
+      timestamp: Date.now(),
+      loading,
+      buttons: [],
+      error: null,
+      images: [],
+      settings: settings,
+      rating: 3,
+    };
+
+    if (settings.model == "stable-diffusion-v1-5") {
+      if (prompt.length < 150 && !modifiers) {
+        modifiers = PromptEngine.getModifers();
+      }
+      if (settings.modify && modifiers) {
+        prompt = prompt + ", " + modifiers;
+      }
+      newMsg.prompt = prompt
+    }
+    return newMsg;
+  }
+
   export const handleUserMessage = async (
     prompt: string,
     userId: string | undefined,
@@ -436,35 +450,24 @@ export namespace Message {
     Settings.use.getState().setOpen(false);
     ChatBar.use.getState().setPrompt("");
 
-    const uid = makeId();
-    const newMsg: Message = {
-      type: MessageType.YOU,
-      id: uid,
-      prompt: prompt,
-      modifiers: modifiers || undefined,
-      timestamp: Date.now(),
-      loading: true,
-      buttons: [],
-      error: null,
-      images: [],
-      settings: settings,
-      rating: 3,
-    };
-    const model = settings.model
+    let loading;
+    // user message
+    loading = false
+    const userMsg = makeMessage(prompt, settings, loading, 
+      MessageType.YOU, modifiers)
+    MessageList.use.getState().addMessage(userMsg);
 
-    if (model == "stable-diffusion-v1-5") {
-      if (prompt.length < 150 && !modifiers) {
-        modifiers = PromptEngine.getModifers();
-      }
-  
-      if (settings.modify && modifiers) {
-        prompt = prompt + ", " + modifiers;
-      }
-      newMsg.prompt = prompt
-    }
+    // response message
+    const type = (
+      settings.model === "instruct-pix2pix" 
+        ? MessageType.PIX2PIX
+        : MessageType.STABLE_DIFFUSION);
+    loading = true
+    const serverMsg = makeMessage(userMsg.prompt, settings, 
+      loading, MessageType.PIX2PIX, userMsg.modifiers)
+    MessageList.use.getState().addMessage(serverMsg);
 
-    MessageList.use.getState().addMessage(newMsg);
-    sendMessage(userId, uid, model, newMsg, credits)
+    sendMessage(userId, serverMsg, credits);
   }
 
   export const askSupabase = async (
