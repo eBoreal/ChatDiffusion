@@ -45,7 +45,7 @@ export function NavBar() {
         Skip to content
       </a>
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex justify-between align-center flex-row py-4 md:py-6 relative">
+        <div className="flex justify-between align-center flex-row py-2 relative">
           <div className="flex flex-1  items-center">
             <Link href="/" className='flex flex-row' aria-label="Logo">
                 <Logo />
