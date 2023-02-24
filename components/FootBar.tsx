@@ -41,13 +41,13 @@ export function FootBar({
     function TextBox(
     ) {
         return (
-            <div onClick={() => handleChoice(false)} className={'p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCardText opacity-90'}>
+            <div className={'p-1 grow text-center h-[8rem] rounded-2xl dropCardText opacity-90'} onClick={() => handleChoice(false)} >
                 <div className={'dropzone p-1 mt-1 rounded-2xl dtext-white'}>
                     <h1 className={'text-xl font-bold'}>
-                        Stable Diffusion 1.5
+                        SD-1.5: Start from text
                     </h1>
                     <p className={'m-1'}>
-                        Start from plain english.
+                        Generate a new image from text.
                     </p>
                     <button onClick={() => handleChoice(false)} type="button" className="btn dropCardTextButton h-8 w-48 mt-2 rounded-2xl">
                         Continue to prompt
@@ -87,14 +87,14 @@ export function FootBar({
             });
         
             return (
-                <div className={'p-1 text-center h-[8rem] w-[17rem] rounded-2xl dropCard opacity-90'}>
+                <div className={'p-1 grow text-center h-[8rem] rounded-2xl dropCard opacity-90'}>
                     <div {...getRootProps({ className: "dropzone p-1 mt-1 rounded-2xl dtext-white border-dashed border-2 border-slate-300" })}>
                         <input {...getInputProps()} />
                         <h1 className={'text-xl font-bold'}>
-                            Instruct Pix2Pix
+                            IPix2Pix: Edit an image
                         </h1>
                         <p className={'m-1'}>
-                            Drag and drop an image to edit it.
+                            Drag and drop an image to edit it from text.
                         </p>
                         <button type="button" className="btn dropCardButton h-8 w-48 m-1 rounded-2xl">
                             Click to select an image
@@ -109,7 +109,7 @@ export function FootBar({
     return (
         <>
             {!hidden ?
-                <div className="flex flex-row w-full justify-evenly mb-5">
+                <div className="flex flex-row justify-evenly gap-x-10 mb-5 max-w-[60.75rem] mx-auto">
                     <ImageBox></ImageBox>
                     <TextBox></TextBox>
                 </div>
