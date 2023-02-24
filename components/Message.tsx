@@ -223,8 +223,6 @@ export namespace Message {
     const model = newMsg?.settings?.model ?? "instruct-pix2pix"
     const uid = newMsg.id
 
-    console.log(`Api not up, sending message for the ${count}th time`)
-
     if (!credits) {
       newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
       newMsg.loading = false;
@@ -285,6 +283,7 @@ export namespace Message {
           newMsg.error = "You're too fast! Slow down! You haven't been credited ;)";
           break;
         case 504:
+          console.log(`Api not up, sending message for the ${count}th time`)
           if (count && count >= 5) {
             newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again. You haven't been credited ;)";
             break;
@@ -298,6 +297,7 @@ export namespace Message {
           newMsg.error = "Something went wrong";
           break;
       }
+
       newMsg.loading = false;
       newMsg.buttons = [
         {
@@ -305,6 +305,7 @@ export namespace Message {
           id: "regenerate",
         },
       ];
+
       MessageList.use.getState().editMessage(uid, newMsg);
       FootBar.use.getState().setHidden(false);
       ChatBar.use.getState().setHidden(true);
@@ -336,6 +337,8 @@ export namespace Message {
       console.log("Decrementing failed: ", e);
       return;
     }
+
+    newMsg.images = data
 
     newMsg.loading = false;
     newMsg.buttons = [
