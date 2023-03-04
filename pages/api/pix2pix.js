@@ -67,11 +67,13 @@ export default async function handler(
             return res.status(500).end()
           } 
           
-          images = makeMessageImages(results.modelOutputs)
+          print(results)
+          
+          // images = makeMessageImages(results.modelOutputs)
 
           // console.log("Received: ", results.modelOutputs)
 
-          return res.status(200).json(images)
+          return res.status(200).json(results.modelOutputs)
 
         } catch (e) {
           console.log("pix2pix failed: ", e);
