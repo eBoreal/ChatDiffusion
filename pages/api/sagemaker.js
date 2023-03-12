@@ -97,7 +97,7 @@ export default async function handler(
         } 
         
         const responseObj = await response.json() // {'image_id', 'user_name', 'image': {'seed', 'text_cfg_scale', 'image_cfg_scale', 'steps', 'image' } }
-        responseObj.image.image = `data:image/png;base64,${responseObj.image.image}`
+        responseObj.image.image = `data:image/jpeg;base64,${responseObj.image.image}`
         // TEST
         // const imageObj = testImage
         // imageObj.image = modelInputs.model_inputs.image

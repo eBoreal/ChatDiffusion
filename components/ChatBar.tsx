@@ -60,8 +60,12 @@ export function ChatBar({
 
   function handleSendMessage(prompt: string) {
     // if (!(user && user.id)) return console.log("Need to be logged in to send message")
-    console.log(user)
-    Message.handleUserMessage(prompt, user.id, 1000)
+    Message.handleUserMessage(
+      prompt, 
+      user.id, 
+      1000,
+      
+      )
     // getCredits({supabase, userId: user.id}
     //   ).then((credits) => {
     //     // if (!credits) {

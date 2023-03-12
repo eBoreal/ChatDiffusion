@@ -72,7 +72,7 @@ export function Message({ id }: { id: string }) {
           )}
         </div>
         {message.prompt && message.type === "you" && message.images.length === 0 && (
-          <p className="text-white/75 text-left break-word">{message.prompt}</p>
+          <p className="text-white/75 text-base text-left break-word">{message.prompt}</p>
         )}
         {message.images && message.images.length > 0 && (
           <div
@@ -128,8 +128,9 @@ export enum MessageType {
   YOU = "you",
   STABLE_DIFFUSION = "stable diffusion",
   OTHER = "other",
+  PHOTOROOM= "PhotoRoom",
   SYSTEM = "system",
-  PIX2PIX = "pix2pix"
+  UNREAL = "UnReal"
 }
 
 export type Message = {
@@ -240,6 +241,7 @@ export namespace Message {
     userId: string,
     newMsg: Message,
     parentImageMsg: Message,
+    photoRoomMsg: Message,
     credits: number,
     count: number = 1
   ) : Promise<any> => {
@@ -257,8 +259,8 @@ export namespace Message {
     const grid = [
       {"img_cfg": 1.2, "text_cfg": 7},
       {"img_cfg": 1.4, "text_cfg": 7},
-      {"img_cfg": 1.5, "text_cfg": 8},
-      {"img_cfg": 1.6, "text_cfg": 9}
+      {"img_cfg": 1.5, "text_cfg": 10},
+      // {"img_cfg": 1.6, "text_cfg": 9}
     ]
     
     let i = 0
@@ -272,6 +274,7 @@ export namespace Message {
       text_cfg_scale: 7,
       image_cfg_scale: 1.5
     }
+
     for (const sample of grid) {
 
       
@@ -279,13 +282,36 @@ export namespace Message {
       inputs.image_cfg_scale = sample.img_cfg
       i+=1
 
-      askSagemaker(inputs)
-      .then(res => res.json())
-      .then(image => {
-          newMsg.images.push(image)
-        
-          MessageList.use.getState().editMessage(uid, newMsg);
-      })
+      try {
+        askSagemaker(inputs)
+        .then(res => res.json())
+        .then(image => {
+            newMsg.images.push(image)
+          
+            MessageList.use.getState().editMessage(uid, newMsg);
+                console.log("EDITING SAGE")
+                console.log("ID", uid)
+                console.log("IMG", image)
+            
+            askPhotoroom(inputs, image)
+              .then(res => res.json())
+              .then(prImage => {
+                photoRoomMsg.images.push(prImage)
+                console.log("EDITING PHOTOROOM")
+                console.log("ID", photoRoomMsg.id)
+                console.log("IMG", prImage)
+
+                MessageList.use.getState().editMessage(photoRoomMsg.id, photoRoomMsg);
+              }
+                
+            )
+
+        })
+
+      } catch (err) {
+        console.log("API ERR: ", err)
+      }
+      
     }
   }
 
@@ -562,23 +588,36 @@ export namespace Message {
     // response message
     const type = (
       settings.model === "instruct-pix2pix" 
-        ? MessageType.PIX2PIX
+        ? MessageType.UNREAL
         : MessageType.STABLE_DIFFUSION);
     loading = true
     const serverMsg = makeMessage(
       userMsg.prompt, 
       settings, 
       loading, 
-      MessageType.PIX2PIX, 
-      userMsg.modifiers,
+      MessageType.UNREAL, 
+      modifiers,
       parentImageMsg.id
     )
     MessageList.use.getState().addMessage(serverMsg);
+
+    // and PR
+    const photoRoomMsg = makeMessage(
+      userMsg.prompt, 
+      settings, 
+      loading, 
+      MessageType.PHOTOROOM, 
+      modifiers,
+      parentImageMsg.id
+    )
+    MessageList.use.getState().addMessage(photoRoomMsg);
+
 
     sendMessageIterative(
       userId,
       serverMsg,
       parentImageMsg,
+      photoRoomMsg,
       credits,
       count
     );
@@ -625,9 +664,24 @@ export namespace Message {
         body: JSON.stringify(inputs)
       })
 
-    return res
+    return res 
+  };
 
-    
+  export const askPhotoroom = async (
+    inputs: any,
+    image: any
+  ) => {
+    const prompt = inputs.prompt + "," + PromptEngine.getModifers();
+    inputs.prompt = prompt
+    inputs.images = [image]
+    // fetch api
+    const res = await fetch("api/photoroom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(inputs)
+      })
+
+    return res 
   };
 
   export const askPix2Pix = async (
