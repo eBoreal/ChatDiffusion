@@ -71,7 +71,7 @@ export default async function handler(
       
       if (!body.images || body.images.length == 0) {
         console.log("need input image for a pix2pix job")
-        return res.status(500).end()
+        return res.status(500).json("need input image for a pix2pix job")
       }
 
       const modelInputs = makeModelInputObject(body)

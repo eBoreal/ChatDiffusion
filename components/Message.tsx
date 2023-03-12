@@ -71,7 +71,7 @@ export function Message({ id }: { id: string }) {
             <Wand2 className="text-white/30 pb-[3px]" size={16} />
           )}
         </div>
-        {message.prompt && message.type === "you" && message.images.length === 0 && (
+        {message.prompt && message.images.length === 0 && !message.loading && (
           <p className="text-white/75 text-base text-left break-word">{message.prompt}</p>
         )}
         {message.images && message.images.length > 0 && (
@@ -286,25 +286,35 @@ export namespace Message {
         askSagemaker(inputs)
         .then(res => res.json())
         .then(image => {
+            if (!image.image) {
+              return
+            }
             newMsg.images.push(image)
           
+            newMsg.buttons = [
+                  {
+                    text: "Download",
+                    id: "save",
+                  }
+                ]
             MessageList.use.getState().editMessage(uid, newMsg);
-                console.log("EDITING SAGE")
-                console.log("ID", uid)
-                console.log("IMG", image)
             
-            askPhotoroom(inputs, image)
-              .then(res => res.json())
-              .then(prImage => {
-                photoRoomMsg.images.push(prImage)
-                console.log("EDITING PHOTOROOM")
-                console.log("ID", photoRoomMsg.id)
-                console.log("IMG", prImage)
+            setTimeout(premadeMsg, 8000)
+              //             credits, count + 1)
+            
 
-                MessageList.use.getState().editMessage(photoRoomMsg.id, photoRoomMsg);
-              }
+            // askPhotoroom(inputs, image)
+            //   .then(res => res.json())
+            //   .then(prImage => {
+            //     photoRoomMsg.images.push(prImage)
+            //     console.log("EDITING PHOTOROOM")
+            //     console.log("ID", photoRoomMsg.id)
+            //     console.log("IMG", prImage)
+
+            //     MessageList.use.getState().editMessage(photoRoomMsg.id, photoRoomMsg);
+            //   }
                 
-            )
+            // )
 
         })
 
@@ -313,9 +323,43 @@ export namespace Message {
       }
       
     }
+
   }
 
+  export async function premadeMsg(
 
+  ) {
+    const premade = [ 
+      "Wow ! Like it ?",
+      "Click on one of the image above to share it!",
+      "Want to keep playing ? ",
+      "Enter some prompts below and see what happens"
+    ]
+    
+    for (const m of premade) {
+      const newMsg: Message = {
+        type: MessageType.UNREAL,
+        id: makeId(),
+        parentId: undefined,
+        prompt: m,
+        modifiers: undefined,
+        timestamp: Date.now(),
+        loading: false,
+        buttons: [],
+        error: null,
+        images: [],
+        settings: null,
+        rating: 3,
+      }
+      MessageList.use.getState().addMessage(newMsg)
+      await delay(800);
+    };
+  }
+  
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+  
   // export const sendMessage = async (
   //   userId: string,
   //   newMsg: Message,
@@ -585,6 +629,16 @@ export namespace Message {
     // retrieve original parent image
     const parentImageMsg = MessageList.getFirstMessage()
 
+
+    const premadeMsg = makeMessage(
+      "Sit tight we're generating your pictures, it should take 5-10 seconds", 
+      settings, 
+      false, 
+      MessageType.UNREAL, 
+      modifiers)
+    MessageList.use.getState().addMessage(premadeMsg);
+
+
     // response message
     const type = (
       settings.model === "instruct-pix2pix" 
@@ -610,7 +664,11 @@ export namespace Message {
       modifiers,
       parentImageMsg.id
     )
-    MessageList.use.getState().addMessage(photoRoomMsg);
+    // MessageList.use.getState().addMessage(photoRoomMsg);
+
+
+    
+    
 
 
     sendMessageIterative(
