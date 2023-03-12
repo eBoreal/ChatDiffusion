@@ -8,6 +8,7 @@ import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
 import { FootBar } from "./FootBar";
+import { User } from "./User";
 
 
 export function Message({ id }: { id: string }) {
@@ -70,10 +71,10 @@ export function Message({ id }: { id: string }) {
             <Wand2 className="text-white/30 pb-[3px]" size={16} />
           )}
         </div>
-        {message.prompt && message.type === "you" && (
+        {message.prompt && message.type === "you" && message.images.length === 0 && (
           <p className="text-white/75 text-left break-word">{message.prompt}</p>
         )}
-        {message.images && message.settings && message.images.length > 0 && (
+        {message.images && message.images.length > 0 && (
           <div
             className={`flex flex-row gap-2 overflow-hidden flex-wrap max-w-full`}
           >
@@ -82,7 +83,7 @@ export function Message({ id }: { id: string }) {
               <Image
                 key={i}
                 i={i}
-                image={image}
+                image={image.image}
                 selectedImage={selectedImage}
                 setSelectedImage={setSelectedImage}
                 message={message}
@@ -134,22 +135,37 @@ export enum MessageType {
 export type Message = {
   type: MessageType;
   id: string;
+  parentId: string | undefined;
   timestamp: number;
   prompt: string;
   modifiers: string | undefined;
   loading: boolean;
   buttons: Button[];
   error: string | null;
-  images: Artifact[];
+  images: ImageArtifact[];
   settings: Settings | null;
   rating: number;
 };
 
-export type Artifact = {
-  image: string;
-  seed: number;
-  id: string;
+export type ImageArt = 
+  {
+    prompt: string,
+    seed: number,
+    text_cfg_scale: number,
+    image_cfg_scale: number,
+    steps: number,
+    image: string
 };
+
+export type ImageArtifact = {
+  id: string,
+  parenteImageId: string,
+  userId: string,
+  image: ImageArt
+};
+
+export type ImageArtifactList = [ImageArtifact]
+
 
 const SURE_ANIME_WORDS = [
   "1girl",
@@ -213,192 +229,239 @@ export namespace Message {
   };
 
 
-  export const sendMessage = async (
+  /**
+   * Iteratively calls the sagemaker endpoint
+   * adds image to newMsg.images on response
+   *
+   * @param prompt - user defined prompt
+   * @param userId - identifier for the user
+   */
+  export const sendMessageIterative = async (
     userId: string,
     newMsg: Message,
+    parentImageMsg: Message,
     credits: number,
     count: number = 1
   ) : Promise<any> => {
 
-    const model = newMsg?.settings?.model ?? "instruct-pix2pix"
+    const parentId = newMsg.parentId
     const uid = newMsg.id
-
-    if (!credits) {
-      newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
-      newMsg.loading = false;
-      MessageList.use.getState().editMessage(uid, newMsg);
-      FootBar.use.getState().setHidden(false);
-      ChatBar.use.getState().setHidden(true);
-      return;
-    }
-
-    if (model !== "instruct-pix2pix" && model !== "stable-diffusion-v1-5") {
-      newMsg.loading = false;
-      newMsg.error = `Support for ${model} is not implemented yet. Open settings to choose another model.`;
-      MessageList.use.getState().editMessage(uid, newMsg);
-      FootBar.use.getState().setHidden(false)
-      ChatBar.use.getState().setHidden(true)
-      return;
-    }
-    
     let res;
-    if (model == "instruct-pix2pix" && newMsg.prompt) {
-      // recover last message with image
-      let lastImages = null;
-      const lastN = MessageList.getLastNMessages(10)
-      for (let m of lastN) {
-        if (m.images.length > 0) {
-          lastImages = m.images
-          break
-        }
-      }
-      if (!lastImages) {
-        newMsg.error = "Pix2pix needs an image to edit, add one by draging it over to the Image to Image box";
-        newMsg.loading = false;
-        MessageList.use.getState().editMessage(uid, newMsg);
-        FootBar.use.getState().setHidden(false)
-        ChatBar.use.getState().setHidden(true)
-        return;
-      }
-
-      try {
-        res = await askPix2Pix(newMsg, lastImages)
-      } catch (e) {
-        console.log("Request to pix2pix failed: ", e)
-      }
-    }
-
-    // -- implement support for SD here -- //
-    if (model == "stable-diffusion-v1-5") {
-      res = await askSD15(newMsg)
-    }
-
-    // process request results
-    if (!res || !res.ok) {
-      switch (res?.status) {
-        case 400:
-          newMsg.error = "Something is wrong with your request. You haven't been credited ;) ";
-          break;
-        case 429:
-          newMsg.error = "You're too fast! Slow down! You haven't been credited ;)";
-          break;
-        case 504:
-          console.log(`Api not up, sending message for the ${count}th time`)
-          if (count && count >= 5) {
-            newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again. You haven't been credited ;)";
-            break;
-          }
-          else {
-            return setTimeout(sendMessage, 5000, userId, newMsg, 
-              credits, count + 1)
-          }
-          
-        default:
-          newMsg.error = "Something went wrong";
-          break;
-      }
-
-      newMsg.loading = false;
-      newMsg.buttons = [
-        {
-          text: "Retry",
-          id: "regenerate",
-        },
-      ];
-
-      MessageList.use.getState().editMessage(uid, newMsg);
-      FootBar.use.getState().setHidden(false);
-      ChatBar.use.getState().setHidden(true);
+    if (!newMsg.prompt || !parentImageMsg.images) {
+      newMsg.error = "Prompt or image missing ";
       return;
-    }
-
-    // model responded
-    const data = await res.json();
-    newMsg.loading = false;
-
-    if (data.length == 0) {
-      newMsg.error = "No results";
-      newMsg.buttons = [
-        {
-          text: "Retry",
-          id: "regenerate",
-        },
-      ];
-      return;
-    }
-    MessageList.use.getState().editMessage(uid, newMsg);
-    
-    // decrement credits
-    let supaRes;
-    try {
-      supaRes = await askSupabase(userId);
+      }
       
-    } catch (e) {
-      console.log("Decrementing failed: ", e);
-      return;
+    const parentImage = parentImageMsg.images
+
+    for (const i of [1, 2, 3]) {
+
+
+
+      askSagemaker(newMsg, parentImage)
+      .then(res => res.json())
+      .then(image => {
+          console.log("RECEIVED API:", image)
+          console.log(typeof(image))
+
+          newMsg.images.push(image)
+        
+          MessageList.use.getState().editMessage(uid, newMsg);
+      })
     }
-
-    newMsg.images = data
-
-    newMsg.loading = false;
-    newMsg.buttons = [
-      {
-        text: "Regenerate",
-        id: "regenerate",
-      },
-      {
-        text: "Download",
-        id: "save",
-      },
-      {
-        text: "Save Prompt",
-        id: "save_prompt",
-      },
-    ];
-
-    if (newMsg.modifiers) {
-      newMsg.buttons.push({
-        text: "Remix",
-        id: "remix",
-      });
-    }
-
-    MessageList.use.getState().editMessage(uid, newMsg);
-
-    FootBar.use.getState().setHidden(false)
-    ChatBar.use.getState().setHidden(true)
   }
 
+
+  // export const sendMessage = async (
+  //   userId: string,
+  //   newMsg: Message,
+  //   credits: number,
+  //   count: number = 1
+  // ) : Promise<any> => {
+
+  //   const model = newMsg?.settings?.model ?? "instruct-pix2pix"
+  //   const uid = newMsg.id
+
+  //   if (!credits) {
+  //     newMsg.error = "You do not have enough credits. Go to your Account to add some and keep chatting :)";
+  //     newMsg.loading = false;
+  //     MessageList.use.getState().editMessage(uid, newMsg);
+  //     FootBar.use.getState().setHidden(false);
+  //     ChatBar.use.getState().setHidden(true);
+  //     return;
+  //   }
+
+  //   if (model !== "instruct-pix2pix" && model !== "stable-diffusion-v1-5") {
+  //     newMsg.loading = false;
+  //     newMsg.error = `Support for ${model} is not implemented yet. Open settings to choose another model.`;
+  //     MessageList.use.getState().editMessage(uid, newMsg);
+  //     FootBar.use.getState().setHidden(false)
+  //     ChatBar.use.getState().setHidden(true)
+  //     return;
+  //   }
+    
+  //   let res;
+  //   if (model == "instruct-pix2pix" && newMsg.prompt) {
+  //     // recover last message with image
+  //     let lastImages = null;
+  //     const lastN = MessageList.getLastNMessages(10)
+  //     for (let m of lastN) {
+  //       if (m.images.length > 0) {
+  //         lastImages = m.images
+  //         break
+  //       }
+  //     }
+  //     if (!lastImages) {
+  //       newMsg.error = "Pix2pix needs an image to edit, add one by draging it over to the Image to Image box";
+  //       newMsg.loading = false;
+  //       MessageList.use.getState().editMessage(uid, newMsg);
+  //       FootBar.use.getState().setHidden(false)
+  //       ChatBar.use.getState().setHidden(true)
+  //       return;
+  //     }
+
+  //     try {
+  //       res = await askPix2Pix(newMsg, lastImages)
+  //     } catch (e) {
+  //       console.log("Request to pix2pix failed: ", e)
+  //     }
+  //   }
+
+  //   // -- implement support for SD here -- //
+  //   if (model == "stable-diffusion-v1-5") {
+  //     res = await askSD15(newMsg)
+  //   }
+
+  //   // process request results
+  //   if (!res || !res.ok) {
+  //     switch (res?.status) {
+  //       case 400:
+  //         newMsg.error = "Something is wrong with your request. You haven't been credited ;) ";
+  //         break;
+  //       case 429:
+  //         newMsg.error = "You're too fast! Slow down! You haven't been credited ;)";
+  //         break;
+  //       case 504:
+  //         console.log(`Api not up, sending message for the ${count}th time`)
+  //         if (count && count >= 5) {
+  //           newMsg.error = "Timeout ! The server is warming up. Wait a few seconds and try again. You haven't been credited ;)";
+  //           break;
+  //         }
+  //         else {
+  //           return setTimeout(sendMessage, 5000, userId, newMsg, 
+  //             credits, count + 1)
+  //         }
+          
+  //       default:
+  //         newMsg.error = "Something went wrong";
+  //         break;
+  //     }
+
+  //     newMsg.loading = false;
+  //     newMsg.buttons = [
+  //       {
+  //         text: "Retry",
+  //         id: "regenerate",
+  //       },
+  //     ];
+
+  //     MessageList.use.getState().editMessage(uid, newMsg);
+  //     FootBar.use.getState().setHidden(false);
+  //     ChatBar.use.getState().setHidden(true);
+  //     return;
+  //   }
+
+  //   // model responded
+  //   const data = await res.json();
+  //   newMsg.loading = false;
+
+  //   if (data.length == 0) {
+  //     newMsg.error = "No results";
+  //     newMsg.buttons = [
+  //       {
+  //         text: "Retry",
+  //         id: "regenerate",
+  //       },
+  //     ];
+  //     return;
+  //   }
+  //   MessageList.use.getState().editMessage(uid, newMsg);
+    
+  //   // decrement credits
+  //   let supaRes;
+  //   try {
+  //     supaRes = await askSupabase(userId);
+      
+  //   } catch (e) {
+  //     console.log("Decrementing failed: ", e);
+  //     return;
+  //   }
+
+  //   newMsg.images = data
+
+  //   newMsg.loading = false;
+  //   newMsg.buttons = [
+  //     {
+  //       text: "Regenerate",
+  //       id: "regenerate",
+  //     },
+  //     {
+  //       text: "Download",
+  //       id: "save",
+  //     },
+  //     {
+  //       text: "Save Prompt",
+  //       id: "save_prompt",
+  //     },
+  //   ];
+
+  //   if (newMsg.modifiers) {
+  //     newMsg.buttons.push({
+  //       text: "Remix",
+  //       id: "remix",
+  //     });
+  //   }
+
+  //   MessageList.use.getState().editMessage(uid, newMsg);
+
+  //   FootBar.use.getState().setHidden(false)
+  //   ChatBar.use.getState().setHidden(true)
+  // }
+
   export const addImageMessage = async (
-    imageUrl: string
+    imageUrl: string,
+    user: User
   ) => {
     const uid = makeId();
     
     const settings = Settings.use.getState().settings;
+    const newImage: ImageArtifact = {
+      id: uid,
+      parenteImageId: uid,
+      userId: user.id,
+      image: {
+        prompt: '',
+        seed: 42,
+        text_cfg_scale: 7,
+        image_cfg_scale: 1.5,
+        steps: 20,
+        image: imageUrl
+      }
+    }
     const newMsg: Message = {
       type: MessageType.YOU,
       id: uid,
+      parentId: undefined,
       prompt: '',
+      modifiers: undefined,
       timestamp: Date.now(),
       loading: false,
       buttons: [],
       error: null,
-      images: [{
-        image: imageUrl,
-        seed: 42,
-        id: "some-string"
-      }],
-      modifiers: undefined,
+      images: [newImage],
       settings: settings,
       rating: 3,
     };
-
-    newMsg.buttons = [
-      {
-        text: "Download",
-        id: "save",
-      },
-    ];
 
     MessageList.use.getState().addMessage(newMsg);  
   }
@@ -408,13 +471,15 @@ export namespace Message {
     settings: any,
     loading: boolean,
     type: MessageType,
-    modifiers?: string
+    modifiers?: string,
+    parentId?: string
   ) => {
 
     const uid = makeId();
     const newMsg: Message = {
       type: type,
       id: uid,
+      parentId: parentId || undefined,
       prompt: prompt,
       modifiers: modifiers || undefined,
       timestamp: Date.now(),
@@ -438,6 +503,15 @@ export namespace Message {
     return newMsg;
   }
 
+  /**
+   * Handler for user new message
+   * Add a user message with prompt input
+   * Add an empty loading server message 
+   * Triggers send message
+   *
+   * @param prompt - user defined prompt
+   * @param userId - identifier for the user
+   */
   export const handleUserMessage = async (
     prompt: string,
     userId: string | undefined,
@@ -454,11 +528,18 @@ export namespace Message {
     ChatBar.use.getState().setPrompt("");
 
     let loading;
-    // user message
+    // user text message
     loading = false
-    const userMsg = makeMessage(prompt, settings, loading, 
-      MessageType.YOU, modifiers)
+    const userMsg = makeMessage(
+      prompt, 
+      settings, 
+      loading, 
+      MessageType.YOU, 
+      modifiers)
     MessageList.use.getState().addMessage(userMsg);
+
+    // retrieve original parent image
+    const parentImageMsg = MessageList.getFirstMessage()
 
     // response message
     const type = (
@@ -466,11 +547,23 @@ export namespace Message {
         ? MessageType.PIX2PIX
         : MessageType.STABLE_DIFFUSION);
     loading = true
-    const serverMsg = makeMessage(userMsg.prompt, settings, 
-      loading, MessageType.PIX2PIX, userMsg.modifiers)
+    const serverMsg = makeMessage(
+      userMsg.prompt, 
+      settings, 
+      loading, 
+      MessageType.PIX2PIX, 
+      userMsg.modifiers,
+      parentImageMsg.id
+    )
     MessageList.use.getState().addMessage(serverMsg);
 
-    sendMessage(userId, serverMsg, credits);
+    sendMessageIterative(
+      userId,
+      serverMsg,
+      parentImageMsg,
+      credits,
+      count
+    );
   }
 
   export const askSupabase = async (
@@ -503,9 +596,35 @@ export namespace Message {
     })
   }
 
+  export const askSagemaker = async (
+    newMsg: Message,
+    parentImage: ImageArtifact[]
+  ) => {
+
+    // fetch api
+    const res = await fetch("api/sagemaker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "John Doe",
+          image_id: newMsg.id,
+          prompt: newMsg.prompt,
+          images: parentImage,
+          steps: newMsg.settings?.steps,
+          text_cfg_scale: newMsg.settings?.scale,
+          image_cfg_scale: newMsg.settings?.img_scale,
+          randomize_cfg: newMsg.settings?.randomize_cfg,
+        })
+      })
+
+    return res
+
+    
+  };
+
   export const askPix2Pix = async (
     newMsg: Message,
-    lastImages: Artifact[]
+    lastImages: ImageArtifact
   ) => {
 
     // fetch api

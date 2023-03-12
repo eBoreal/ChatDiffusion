@@ -9,12 +9,15 @@ import { Database } from '../types/supabase'
 import {Logo} from './Logo';
 import s from '../styles/navbar.module.css';
 import { MessageList } from "./MessageList";
+import { User } from "./User";
+
 import { getCredits } from "../utils/api-helpers"
 
 export function NavBar() {
-  const supabase = useSupabaseClient<Database>()
-  const user = useUser()
-  const session = useSession()
+  // const supabase = useSupabaseClient<Database>()
+  // const user = useUser()
+  // const session = useSession()
+  const user = User.use.getState()
   const router = useRouter()
 
   const [credits, setCredits] = NavBar.use((state) => [
@@ -22,21 +25,21 @@ export function NavBar() {
     state.setCredits,
   ])
 
-  useEffect(() => {
-    if (!supabase || !user || !user.id) return;
+  // useEffect(() => {
+  //   if (!supabase || !user || !user.id) return;
 
-    getCredits({supabase, userId: user.id}).then(setCredits)
-  }, [session])
+  //   // getCredits({supabase, userId: user.id}).then(setCredits)
+  // }, [session])
 
-  useEffect(() => {
-    const unsub = MessageList.use.subscribe(()=>{
-      if (!supabase || !user || !user.id) return;
+  // useEffect(() => {
+  //   const unsub = MessageList.use.subscribe(()=>{
+  //     if (!supabase || !user || !user.id) return;
 
-      getCredits({supabase, userId: user.id}).then(setCredits)
-    })
+  //     // getCredits({supabase, userId: user.id}).then(setCredits)
+  //   })
     
-    return () => unsub();
-  }, [])
+  //   return () => unsub();
+  // }, [])
 
   
   return (
@@ -48,26 +51,35 @@ export function NavBar() {
         <div className="flex justify-between align-center flex-row py-2 relative">
           <div className="flex flex-1  items-center">
             <Link href="/" className='flex flex-row' aria-label="Logo">
-                <Logo />
+                {/* <Logo /> */}
                 <p className="font-extrabold text-white ml-2 text-xl">
-                  ChatDiffusion [beta]
+                  BeUnreal
                 </p>
             </Link>
           </div>
           
 
           <div className="flex flex-1 justify-end space-x-8">
-            {!(router.pathname === '/chat') ? (
+            {/* {!(router.pathname === '/chat') ? (
               <Link href="/chat" className="link dropCardText">
                 Launch Chat
               </Link>
             ) : (
+              <></>
               <Link href="/account" className="link dropCardText">
                 {`Credits: ${credits}`}
               </Link>
+            )} */}
+
+            {(router.pathname === '/chat') ? (
+              <Link href="/challenge" className="link dropCardText">
+                Challenge
+              </Link>
+            ) : (
+              <></>
             )}
 
-            {session ? (
+            {/* {session ? (
               <Link href="/account" className="link dropCard">
                 My Account
               </Link>
@@ -75,7 +87,7 @@ export function NavBar() {
               <Link href="/login" className="link dropCard">
                 Sign in
               </Link>
-            )}
+            )} */}
           </div>
         </div>
       </div>

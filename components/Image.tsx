@@ -1,5 +1,5 @@
 import React from "react";
-import { Artifact, Message } from "./Message";
+import { ImageArt, Message } from "./Message";
 
 export function Image({
   image,
@@ -8,7 +8,7 @@ export function Image({
   message,
   i,
 }: {
-  image: Artifact;
+  image: ImageArt;
   selectedImage: number;
   setSelectedImage(i: number): void;
   message: Message;
@@ -36,22 +36,22 @@ export function Image({
           selectedImage === i || message.images?.length === 1
             ? "25rem"
             : "10rem",
-        // maxWidth:
-        //   selectedImage === i || message.images?.length === 1
-        //     ? "25rem"
-        //     : "10rem",
-        height:
-          selectedImage > -1 &&
-          selectedImage !== i &&
-          message.images?.length !== 1
-            ? "0"
-            : `${message.settings?.height}px`,
-        // width:
+        maxWidth:
+          selectedImage === i || message.images?.length === 1
+            ? "25rem"
+            : "10rem",
+        // height:
         //   selectedImage > -1 &&
         //   selectedImage !== i &&
         //   message.images?.length !== 1
         //     ? "0"
-        //     : `${message.settings?.width}px`,
+        //     : `${message.settings?.height}px`,
+        width:
+          selectedImage > -1 &&
+          selectedImage !== i &&
+          message.images?.length !== 1
+            ? `${message.settings?.width}px`
+            : `${message.settings?.width}px`,
       }}
       onClick={() => {
         if (message.images?.length === 1) return;

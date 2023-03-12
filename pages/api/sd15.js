@@ -14,6 +14,7 @@ const makeModelInputObject = (body) => {
   }
 }
 
+
 const makeMessageImages = (modelOutputs) => {
   return [
     {

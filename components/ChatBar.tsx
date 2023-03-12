@@ -3,6 +3,7 @@ import React from "react";
 
 import { Album, Send, Settings2 } from "lucide-react";
 import create from "zustand";
+// import { User } from '../components/User' 
 
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Database } from '../types/supabase'
@@ -14,18 +15,31 @@ import { PromptBook } from "./PromptBook";
 import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
 import { getCredits } from '../utils/api-helpers'
+import { useState, useEffect } from 'react'
 
 export function ChatBar({
   }) {
-    const supabase = useSupabaseClient<Database>()
-    const user = useUser()
+    // const supabase = useSupabaseClient<Database>()
+    // const user = useUser()
     // const router = useRouter()
-
+    let [user, setUser] = useState({
+      id: "11111",
+      name: "John Doe"
+    })
+  
+    useEffect(() => {
+        const retrieved = JSON.parse(
+            window.localStorage.getItem("UnrealUser") || "John Doe"
+            )
+        setUser(retrieved)
+      }, [])
+  
 
     const [prompt, setPrompt] = ChatBar.use((state) => [
-    state.prompt,
-    state.setPrompt,
-  ]);
+      state.prompt,
+      state.setPrompt,
+    ]);
+
 
   const [hidden, setHidden] = ChatBar.use((state) => [
     state.hidden,
@@ -45,22 +59,23 @@ export function ChatBar({
   const history = MessageList.use((state) => state.messages);
 
   function handleSendMessage(prompt: string) {
-    if (!(user && user.id)) return console.log("Need to be logged in to send message")
-    
-    getCredits({supabase, userId: user.id}
-      ).then((credits) => {
-        // if (!credits) {
-        //   console.log("Not enough credits to send message")
-        //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
-        //   return
-        // } 
+    // if (!(user && user.id)) return console.log("Need to be logged in to send message")
+    console.log(user)
+    Message.handleUserMessage(prompt, user.id, 1000)
+    // getCredits({supabase, userId: user.id}
+    //   ).then((credits) => {
+    //     // if (!credits) {
+    //     //   console.log("Not enough credits to send message")
+    //     //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
+    //     //   return
+    //     // } 
         
-        Message.handleUserMessage(prompt, user.id, credits)})
+    //     Message.handleUserMessage(prompt, user.id, credits)})
   }
 
   return (
     <div className="bg-background">
-      {!hidden ?
+      {true ?
         <>
           <div
             className={`${

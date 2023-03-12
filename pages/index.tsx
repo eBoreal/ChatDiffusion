@@ -1,6 +1,9 @@
 import React from "react";
 import Link from 'next/link';
 
+import { User } from '../components/User' 
+import { makeId } from "../components/MessageList";
+
 import { useRouter } from 'next/router';
 import { BigLogo } from '../components/Logo'
 
@@ -47,6 +50,17 @@ var examples = [
 
 export default function Home() {
   const router = useRouter();
+
+  const [id, setId] = User.use((state) => [
+    state.id,
+    state.setId,
+  ]);
+
+  const [name, setName] = User.use((state) => [
+  state.name,
+  state.setName,
+  ]);
+
 
   function GalleryImage({
     path
@@ -152,48 +166,71 @@ export default function Home() {
       {/* header */}
       <div className="max-w-6xl mx-auto space-y-40 py-8 sm:flex sm:flex-col sm:py-24 px-4 sm:px-6 lg:px-8">
         
-        <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            ChatDiffusion
+        <div className="flex flex-col align-center mx-auto">
+          <h1 className="text-4xl font-extrabold text-white text-center sm:text-6xl">
+            Time to be Unreal
           </h1>
-          <p className="mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl max-w-2xl m-auto">
-            Edit images from text.
-          </p>
-          <button onClick={() => router.push("/chat")} type="button" className="btn dropCard font-bold text-xl h-12 w-48 mt-8 rounded-2xl mx-auto">
-                        Get started
+          <h2 className="mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl max-w-2xl m-auto">
+            Take part to the challenge of the day !
+          </h2>
+          <div
+              className={`px-4 py-3 mt-10 z-10 bg-chatbox flex flex-row items-center w-full mb-6 border-t border-background rounded-lg`}
+            >
+            <input
+                  type="text"
+                  className="w-full text-lg text-white/75 placeholder:text-white/30 outline-none focus:border-none bg-transparent"
+                  placeholder="Enter a name & click reveal"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+            >
+            </input>
+          </div>
+
+          <button onClick={() => {
+            const id =makeId()
+            window.localStorage.setItem("UnrealUser", JSON.stringify({
+              name: name,
+              id: id
+            }));
+            console.log(JSON.parse(
+              window.localStorage.getItem("UnrealUser") || "John Doe"
+              ))
+            router.push("/challenge")
+            }} type="button" className="btn dropCard font-bold text-xl h-12 w-48 mt-8 rounded-2xl mx-auto">
+              Reveal
           </button>
         </div>
 
         {/* tagline */}
-        <h1 className="font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
+        {/* <h1 className="font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
           Check out some examples of what you can do below...
-        </h1>
+        </h1> */}
 
         {/* galery of examples */}
-        <div className={`dw-full bg-chatbox rounded-lg p-8`}>
+        {/* <div className={`dw-full bg-chatbox rounded-lg p-8`}>
           <h2 className="font-extrabold text-white text-2xl mb-2">{"Elon's example"}</h2>
           <div className={'sm:flex sm:flex-row space-x-4 '}>
             {examples.map((path: string, i) => <GalleryImage key={i} path={path}/>)}
           </div>
-        </div>
+        </div> */}
 
         {/* tagline 2*/}
-        <h1 className="font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
+        {/* <h1 className="font-bold text-transparent bg-clip-text bg-gradient-to-r text-gradient sm:text-center sm:text-4xl">
             Drop something to edit and chat with the model
-        </h1>
+        </h1> */}
 
         {/* steps */}
-        {instructions.map((step: InstructionStep,  i) => 
+        {/* {instructions.map((step: InstructionStep,  i) => 
           <Step key={i} id={i+1} step={step}/>)
-        }        
+        }         */}
 
         {/* launch app footer */}
-        <button onClick={() => router.push("/chat")} type="button" className="btn dropCard font-bold text-xl h-12 w-48 rounded-2xl mx-auto">
+        {/* <button onClick={() => router.push("/chat")} type="button" className="btn dropCard font-bold text-xl h-12 w-48 rounded-2xl mx-auto">
             Launch App
-        </button>
+        </button> */}
 
         {/* Credits & Acknowledgements section*/}
-        <div className={`sm:flex sm:flex-row  w-full hover:bg-black/10 group`}>
+        {/* <div className={`sm:flex sm:flex-row  w-full hover:bg-black/10 group`}>
           <div
               className={`bg-chatbox rounded-lg p-8 max-h-72 m-auto w-full relative px-2 lg:px-0 flex flex-col`}
             >
@@ -207,7 +244,7 @@ export default function Home() {
               <li>- HuggingFace diffusers for their <a  href="https://github.com/huggingface/diffusers" className="underline">implementation of Stable Diffusion and Pix2Pix</a ></li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
         
         <div className="m-auto mt-20">

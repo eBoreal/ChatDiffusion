@@ -57,10 +57,10 @@ export namespace MessageList {
     return [message, setMessage] as const;
   };
 
-  export const getLastNMessages = (n: number) => {
+  export const getFirstMessage= () => {
     const messages = use.getState().messages;
 
-    const values = Object.values(messages);
-    return values.sort((a, b) => b.timestamp - a.timestamp).slice(0, n);
+    const firstM = Object.values(messages)[0];
+    return firstM;
   };
 }

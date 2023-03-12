@@ -72,7 +72,6 @@ export default async function handler(
           // images = makeMessageImages(results.modelOutputs)
 
           // console.log("Received: ", results.modelOutputs)
-
           return res.status(200).json(results.modelOutputs)
 
         } catch (e) {

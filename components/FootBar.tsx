@@ -1,9 +1,11 @@
 import React from "react";
 import create from "zustand";
+import { useRouter } from 'next/router';
 
 import { ChatBar } from "./ChatBar";
 import { Message } from "./Message";
 import { Settings } from "./Settings";
+import { User } from "./User";
 
 // TODO: remove react-dropzone dependency and implement ImageBox from scratch
 import { useDropzone } from "react-dropzone";
@@ -11,6 +13,9 @@ import { useDropzone } from "react-dropzone";
 
 export function FootBar({
   }) {
+
+    const user = User.use.getState()
+    const router = useRouter();
 
     const [setChatBarHidden] = ChatBar.use((state) => [
       state.setHidden,
@@ -30,12 +35,13 @@ export function FootBar({
     function handleChoice( 
         pix2pix: boolean
     ) {
-        setHidden(true)
+        // setHidden(true)
         setSettings({
             ...settings,
             model: pix2pix ? "instruct-pix2pix" : "stable-diffusion-v1-5"
         })
         setChatBarHidden(false)
+        router.push("/chat")
     }
 
     function TextBox(
@@ -67,7 +73,7 @@ export function FootBar({
               
                 reader.onloadend = function() {
                     if (reader.result && typeof(reader.result) == 'string') {
-                        Message.addImageMessage(reader.result);
+                        Message.addImageMessage(reader.result, user);
                         handleChoice(true)
                     }
     
@@ -87,17 +93,17 @@ export function FootBar({
             });
         
             return (
-                <div className={'p-1 grow text-center h-[8rem] rounded-2xl dropCard opacity-90'}>
-                    <div {...getRootProps({ className: "dropzone p-1 mt-1 rounded-2xl dtext-white border-dashed border-2 border-slate-300" })}>
+                <div className={'p-8 grow text-center  rounded-2xl dropCard opacity-90'}>
+                    <div {...getRootProps({ className: "dropzone p-4 rounded-2xl dtext-white border-dashed border-2 border-slate-300" })}>
                         <input {...getInputProps()} />
                         <h1 className={'text-xl font-bold'}>
-                            IPix2Pix: Edit an image
+                         🔥 Your selfie in a famous art style 🔥
                         </h1>
-                        <p className={'m-1'}>
-                            Drag and drop an image to edit it from text.
+                        <p className={'m-4'}>
+                            Send us a selfie and we'll make it UNREAL !
                         </p>
-                        <button type="button" className="btn dropCardButton h-8 w-48 m-1 rounded-2xl">
-                            Click to select an image
+                        <button type="button" className="btn dropCardButton h-14 w-48 m-1 rounded-2xl">
+                            Click to take a selfie / upload one
                         </button>
                     </div>
                 </div>
@@ -108,10 +114,10 @@ export function FootBar({
 
     return (
         <>
-            {!hidden ?
-                <div className="flex flex-row justify-evenly gap-x-10 mb-5 max-w-[60.75rem] mx-auto">
+            {true ?
+                <div className="flex flex-row justify-evenly gap-x-10 m-5 mx-auto">
                     <ImageBox></ImageBox>
-                    <TextBox></TextBox>
+                    {/* <TextBox></TextBox> */}
                 </div>
             :
                 <></>

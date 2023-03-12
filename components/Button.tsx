@@ -33,21 +33,22 @@ export function Button({
   selectedImage: number;
 }) {
   const addPrompt = PromptBook.use((state) => state.addPrompt);
-  const supabase = useSupabaseClient<Database>()
+  // const supabase = useSupabaseClient<Database>()
   const user = useUser()
   
   function handleSendMessage(prompt: string, modifiers: string | undefined) {
     if (!(user && user.id)) return console.log("Need to be logged in to send message")
     
-    getCredits({supabase, userId: user.id}
-      ).then((credits) => {
-        // if (!credits) {
-        //   console.log("Not enough credits to send message")
-        //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
-        //   return
-        // } 
+    Message.handleUserMessage(prompt, user.id, 1000, modifiers)
+    // getCredits({supabase, userId: user.id}
+    //   ).then((credits) => {
+    //     // if (!credits) {
+    //     //   console.log("Not enough credits to send message")
+    //     //   router.replace(`${process.env.NEXT_PUBLIC_BASE_URL}/account`)
+    //     //   return
+    //     // } 
         
-        Message.handleUserMessage(prompt, user.id, credits, modifiers)})
+    //     Message.handleUserMessage(prompt, user.id, credits, modifiers)})
   }
 
   return (
@@ -61,13 +62,13 @@ export function Button({
           if (selectedImage === -1) {
             message.images.forEach((image, i) =>
               saveImage(
-                image.image,
+                image.image.image,
                 `${message.prompt.replace(/[^a-zA-Z0-9]/g, "_")}-${i}`
               )
             );
           } else {
             saveImage(
-              message.images[selectedImage].image,
+              message.images[selectedImage].image.image,
               message.prompt.replace(/[^a-zA-Z0-9]/g, "_")
             );
           }
