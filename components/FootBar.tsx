@@ -100,7 +100,7 @@ export function FootBar({
                          🔥 Your selfie in a famous art style 🔥
                         </h1>
                         <p className={'m-4'}>
-                            Send us a selfie and we'll make it UNREAL !
+                            {"Send us a selfie and we'll make it UNREAL !"}
                         </p>
                         <button type="button" className="btn dropCardButton h-14 w-48 m-1 rounded-2xl">
                             Click to take a selfie / upload one

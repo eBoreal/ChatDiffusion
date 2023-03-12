@@ -10,7 +10,7 @@ export const config = { api: {
 }};
 
 
-export default async function (
+export default async function hooks (
     req: any, 
     res: any
 )   {
