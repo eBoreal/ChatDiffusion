@@ -262,25 +262,26 @@ export namespace Message {
     ]
     
     let i = 0
+    const inputs = {
+      randomize_cfg: newMsg.settings?.randomize_cfg || false,
+      image_id: newMsg.id + "-" + i,
+      user_name: userId,
+      prompt: newMsg.prompt,
+      images: parentImage,
+      steps: newMsg.settings?.steps || 20,
+      text_cfg_scale: 7,
+      image_cfg_scale: 1.5
+    }
     for (const sample of grid) {
 
-      const inputs = {
-        steps: newMsg.settings?.steps || 20,
-        text_cfg_scale: sample.text_cfg,
-        image_cfg_scale: sample.img_cfg,
-        randomize_cfg: newMsg.settings?.randomize_cfg || false,
-        image_id: newMsg.id + "-" + i,
-        user_name: userId,
-        prompt: newMsg.prompt,
-        images: parentImage
-      }
+      
+      inputs.text_cfg_scale = sample.text_cfg
+      inputs.image_cfg_scale = sample.img_cfg
       i+=1
 
       askSagemaker(inputs)
       .then(res => res.json())
       .then(image => {
-          console.log("RECEIVED API:", image)
-          console.log(typeof(image))
           newMsg.images.push(image)
         
           MessageList.use.getState().editMessage(uid, newMsg);

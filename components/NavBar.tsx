@@ -75,7 +75,7 @@ export function NavBar() {
               <Link  href="/challenge" className="link dropCardText" onClick={
                 ()=> MessageList.use.getState().deleteMessage()
               }>
-                Challenge
+                Restart
               </Link>
             ) : (
               <></>
