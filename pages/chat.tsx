@@ -6,6 +6,8 @@ import { ChatBar } from "../components/ChatBar";
 import { MessageList } from "../components/MessageList";
 import { FootBar } from "../components/FootBar"
 import { User } from '../components/User'
+import { DragEvent } from 'react';
+import { SmallImageBox} from '../components/FootBar';
 
 import { redirectToLogin } from '../utils/protectRoutes'
 
@@ -60,18 +62,29 @@ export default function Chat() {
     mainConatiner.current?.offsetHeight,
   ]);
 
+
+  
   return (
     <>
-      <main className="flex flex-col gap-1 w-full items-start" ref={mainConatiner}>
+      <main className="flex flex-col gap-1 w-full  v" ref={mainConatiner}>
           {/* <ChannelTop /> */}
           <MessageList />
       </main>
 
-      <div className="fixed bottom-0 w-screen"
+      <div className="absolute bottom-0 w-screen"
            ref={inputContainer}>
 
         {/* 1 showing at the time depending on state */}
-        <ChatBar/>
+        <div className="flex flex-row justify-items-stretch w-full ">
+          {/* <div>
+            <FootBar></FootBar>
+          </div> */}
+          <div className="w-full max-w-[60.75rem] mx-auto">
+            <ChatBar/>
+          </div>
+
+        </div>
+          
         {/* <FootBar/> */}
       </div>
     </>

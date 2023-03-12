@@ -108,9 +108,7 @@ export function FootBar({
                     </div>
                 </div>
             );
-
         }
-    
 
     return (
         <>
@@ -124,9 +122,54 @@ export function FootBar({
             }
         </>
     )
-    
+        
 
 }
+
+
+export function SmallImageBox(
+    ) {
+        function onDrop(
+            acceptedFile: Blob[]
+            ) {
+            console.log("drop")
+            const file = acceptedFile[0]
+            var reader = new FileReader();
+          
+            reader.onloadend = function() {
+                if (reader.result && typeof(reader.result) == 'string') {
+                    console.log("drop")
+                }
+
+            };
+          
+            reader.readAsDataURL(file);
+        };
+      
+        const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
+        useDropzone({
+        accept: {
+            'image/png': ['.png'],
+            'image/jpg': ['.jpg'],
+            'image/jpeg': ['.jpeg'],
+        },
+        onDrop,
+        });
+    
+        return (
+            <div {...getRootProps({ className: "dropzone dropCard w-[30] p-3 w-40 mx-5 rounded" })}>
+                    <input {...getInputProps()} />
+                    <p className={'m-4'}>
+                        {"Drop to share"}
+                    </p>
+            </div>
+        );
+
+    }
+
+
+
+
 
 export type FootBar = {
   hidden: boolean;

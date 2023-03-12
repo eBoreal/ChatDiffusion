@@ -9,6 +9,7 @@ import { PromptEngine } from "./PromptEngine";
 import { Settings } from "./Settings";
 import { FootBar } from "./FootBar";
 import { User } from "./User";
+import { useState, useEffect } from 'react'
 
 
 export function Message({ id }: { id: string }) {
