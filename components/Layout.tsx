@@ -14,8 +14,8 @@ interface Props {
 export default function Layout({ children }: Props) {
     const router = useRouter();
     const meta = {
-      title: 'ChatDiffusion',
-      description: 'Edit your images from text.',
+      title: 'BeUnreal',
+      description: 'Unreal images for real people.',
     };
   
     return (

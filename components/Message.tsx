@@ -18,7 +18,7 @@ export function Message({ id }: { id: string }) {
   const savedPrompts = PromptBook.use((state) => state.prompts);
 
   return (
-    <div className={`my-2 w-full hover:bg-black/10 group`}>
+    <div className={`my-2 w-full mt-auto hover:bg-black/10 group`}>
       <div
         className={`mx-auto max-w-[60rem] relative px-2 lg:px-0 flex flex-col w-full ${
           message.type === "you" ? "items-end" : "items-start"
@@ -92,7 +92,7 @@ export function Message({ id }: { id: string }) {
           </div>
         )}
         {message.error && <p className="text-red-500">{message.error}</p>}
-        {message.loading && message.images && message.images.length === 0 && (
+        {message.loading && message.images && message.images.length < 3 && (
           <div className="flex flex-row gap-1 my-3">
             <div className="animate-pulse bg-white/25 w-3 h-3 rounded-full" />
             <div className="animate-pulse bg-white/25 delay-75 w-3 h-3 rounded-full" />
@@ -254,16 +254,33 @@ export namespace Message {
       
     const parentImage = parentImageMsg.images
 
-    for (const i of [1, 2, 3]) {
+    const grid = [
+      {"img_cfg": 1.2, "text_cfg": 7},
+      {"img_cfg": 1.4, "text_cfg": 7},
+      {"img_cfg": 1.5, "text_cfg": 8},
+      {"img_cfg": 1.6, "text_cfg": 9}
+    ]
+    
+    let i = 0
+    for (const sample of grid) {
 
+      const inputs = {
+        steps: newMsg.settings?.steps || 20,
+        text_cfg_scale: sample.text_cfg,
+        image_cfg_scale: sample.img_cfg,
+        randomize_cfg: newMsg.settings?.randomize_cfg || false,
+        image_id: newMsg.id + "-" + i,
+        user_name: userId,
+        prompt: newMsg.prompt,
+        images: parentImage
+      }
+      i+=1
 
-
-      askSagemaker(newMsg, parentImage)
+      askSagemaker(inputs)
       .then(res => res.json())
       .then(image => {
           console.log("RECEIVED API:", image)
           console.log(typeof(image))
-
           newMsg.images.push(image)
         
           MessageList.use.getState().editMessage(uid, newMsg);
@@ -597,24 +614,14 @@ export namespace Message {
   }
 
   export const askSagemaker = async (
-    newMsg: Message,
-    parentImage: ImageArtifact[]
+    inputs: any,
   ) => {
 
     // fetch api
     const res = await fetch("api/sagemaker", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: "John Doe",
-          image_id: newMsg.id,
-          prompt: newMsg.prompt,
-          images: parentImage,
-          steps: newMsg.settings?.steps,
-          text_cfg_scale: newMsg.settings?.scale,
-          image_cfg_scale: newMsg.settings?.img_scale,
-          randomize_cfg: newMsg.settings?.randomize_cfg,
-        })
+        body: JSON.stringify(inputs)
       })
 
     return res

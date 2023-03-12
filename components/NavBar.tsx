@@ -72,7 +72,9 @@ export function NavBar() {
             )} */}
 
             {(router.pathname === '/chat') ? (
-              <Link href="/challenge" className="link dropCardText">
+              <Link  href="/challenge" className="link dropCardText" onClick={
+                ()=> MessageList.use.getState().deleteMessage()
+              }>
                 Challenge
               </Link>
             ) : (

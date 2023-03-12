@@ -27,7 +27,7 @@ export type MessageHistory = {
   messages: Record<string, Message>;
   addMessage: (message: Message) => void;
   editMessage: (id: string, message: Message) => void;
-  deleteMessage: (id: string) => void;
+  deleteMessage: () => void;
 };
 
 export namespace MessageList {
@@ -41,9 +41,11 @@ export namespace MessageList {
       set((state: MessageHistory) => ({
         messages: { ...state.messages, [id]: message },
       })),
-    deleteMessage: (id: string) => {
+    deleteMessage: () => {
       const messages = { ...MessageList.use.getState().messages };
-      delete messages[id];
+      for (const k of Object.keys(messages)) {
+        delete messages[k]
+      }
       set((state: MessageHistory) => ({
         messages,
       }));

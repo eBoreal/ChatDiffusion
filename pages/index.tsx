@@ -247,9 +247,9 @@ export default function Home() {
         </div> */}
 
         
-        <div className="m-auto mt-20">
+        {/* <div className="m-auto mt-20">
           <BigLogo/>
-        </div>  
+        </div>   */}
       </div>
     </section>
 

@@ -17,7 +17,7 @@ const makeModelInputObject = (body) => {
     "model_inputs": {
       "prompt": body.prompt,
       "steps": body.steps,
-      "image_cfg_scale": body.image_cfg_scale/10,
+      "image_cfg_scale": body.image_cfg_scale,
       "text_cfg_scale": body.text_cfg_scale,
       "num_images_per_prompt": 1,
       "test_mode": just_test_img,

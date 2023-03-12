@@ -32,7 +32,7 @@ export default function Chat() {
 
   React.useEffect(() => {
     if (mainConatiner.current && inputContainer.current) {
-      mainConatiner.current.style.marginTop = `calc(100vh - ${425}px)`;
+      mainConatiner.current.style.marginTop = `10vh`;
     }
 
     const ubnsub = MessageList.use.subscribe(() => {
