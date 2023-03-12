@@ -300,7 +300,7 @@ export namespace Message {
                 ]
             MessageList.use.getState().editMessage(uid, newMsg);
             
-            setTimeout(premadeMsg, 8000)
+            // setTimeout(premadeMsg, 8000)
               //             credits, count + 1)
             
 
