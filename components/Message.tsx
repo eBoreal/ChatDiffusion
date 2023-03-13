@@ -260,7 +260,7 @@ export namespace Message {
       {"img_cfg": 1.2, "text_cfg": 7},
       {"img_cfg": 1.4, "text_cfg": 7},
       {"img_cfg": 1.5, "text_cfg": 10},
-      // {"img_cfg": 1.6, "text_cfg": 9}
+      {"img_cfg": 1.6, "text_cfg": 9}
     ]
     
     let i = 0
