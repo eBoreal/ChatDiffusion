@@ -35,11 +35,11 @@ export function Image({
         maxHeight:
           selectedImage === i || message.images?.length === 1
             ? "25rem"
-            : "10rem",
+            : "20rem",
         maxWidth:
           selectedImage === i || message.images?.length === 1
             ? "25rem"
-            : "10rem",
+            : "20rem",
         // height:
         //   selectedImage > -1 &&
         //   selectedImage !== i &&
